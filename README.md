@@ -10,7 +10,7 @@ Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fas
 
 - 🤖 **AI-powered customer perspective** - AI acts like a real customer encountering your product
 - ❓ **Natural question generation** - Questions use what, who, which, whose, when, why, where, how
-- ⏭️  **Skip questions** - Press Enter to skip any question you don't want to answer
+- ⏭️ **Skip questions** - Press Enter to skip any question you don't want to answer
 - 💡 **Structured content ideas** - Generate article titles with detailed summaries (100-150 chars)
 - 🚫 **Smart deduplication** - No duplicate or similar content ideas (70%+ similarity filtered)
 - 🎨 **Colorful interface** - Easy-to-read colored output (menu, questions, outputs, success messages)
@@ -57,6 +57,36 @@ cp .env.example .env
 uv run python main.py
 ```
 
+### Run Tests
+
+```bash
+# Run all tests
+uv run pytest tests/ -v
+
+# Run specific test file
+uv run pytest tests/test_session.py -v
+```
+
+### Add Dependencies
+
+```bash
+# Add runtime dependency
+uv add package-name
+
+# Add dev dependency
+uv add --dev package-name
+```
+
+### Update Dependencies
+
+```bash
+# Update all dependencies
+uv sync --upgrade
+
+# Update specific package
+uv add package-name@latest
+```
+
 ---
 
 ## How It Works
@@ -72,6 +102,7 @@ The AI acts as a **smart customer evaluating a product before purchase**. This h
 ### First Round Questions
 
 The AI asks basic customer questions using various question types:
+
 - **What** is this product used for?
 - **Who** is this product designed for?
 - **How** do I use this product properly?
@@ -101,6 +132,7 @@ The AI **never re-asks clearly answered questions** and **never makes assumption
 ### Content Ideas - High-Quality & Unique
 
 Generated content titles are:
+
 - ✅ **Unique** - No duplicates or similar ideas (70%+ similarity filtered)
 - ✅ **High-performing** - Optimized for conversions
 - ✅ **Multi-audience** - Appeals to new buyers, search engines, and AI assistants
@@ -144,7 +176,7 @@ Your answer: Commuters, fitness enthusiasts, and remote workers
 Your answer: Pair via Bluetooth, charge before first use, adjust fit for comfort
 
 [4/5] What makes this product different from others on the market?
-Your answer: 
+Your answer:
 
   ⏭️  Skipped
 
@@ -245,40 +277,6 @@ All session data is saved to `out_content_ideas.json`:
 
 ---
 
-## Development
-
-### Run Tests
-
-```bash
-# Run all tests
-uv run pytest tests/ -v
-
-# Run specific test file
-uv run pytest tests/test_session.py -v
-```
-
-### Add Dependencies
-
-```bash
-# Add runtime dependency
-uv add package-name
-
-# Add dev dependency
-uv add --dev package-name
-```
-
-### Update Dependencies
-
-```bash
-# Update all dependencies
-uv sync --upgrade
-
-# Update specific package
-uv add package-name@latest
-```
-
----
-
 ## Project Structure
 
 ```
@@ -308,7 +306,7 @@ content-planner/
 
 - **Python**: 3.13.3 (latest stable version for 2025)
 - **Package Manager**: [uv](https://docs.astral.sh/uv/) (10-100x faster than pip)
-- **Dependencies**: 
+- **Dependencies**:
   - `ollama` - AI integration with Ollama Cloud
   - `python-dotenv` - Environment variable management
   - `pytest` - Testing framework
@@ -336,28 +334,33 @@ content-planner/
 ### Core Components
 
 **AI Client** (`ai/client.py`)
+
 - Handles all Ollama Cloud API interactions
 - Generates questions based on product and context
 - Creates content ideas from Q&A sessions
 - Graceful degradation when API is unavailable
 
 **Session Manager** (`agents/session.py`)
+
 - Manages application state
 - Handles JSON persistence
 - Background autosave thread (every 5 minutes)
 - Tracks Q&A history and content ideas
 
 **Content Planner Agent** (`agents/planner.py`)
+
 - Orchestrates the main workflow
 - Coordinates between AI, UI, and session components
 - Implements iterative Q&A rounds
 
 **Console UI** (`ui/console.py`)
+
 - User input/output handling
 - Help menu and error displays
 - Formatted output for questions and ideas
 
 **Configuration** (`utils/config.py`)
+
 - Environment variable management
 - Default values and validation
 - API availability checks

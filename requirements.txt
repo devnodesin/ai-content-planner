@@ -1,0 +1,8 @@
+# Requirements (Legacy - for pip users)
+# This project uses uv for dependency management (see pyproject.toml)
+# For modern setup, use: uv sync
+# For legacy pip setup, use: pip install -r requirements.txt
+
+ollama>=0.4.0
+python-dotenv>=1.0.0
+pytest>=8.0.0

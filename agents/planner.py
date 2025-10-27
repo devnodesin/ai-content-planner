@@ -33,7 +33,8 @@ class ContentPlannerAgent:
         try:
             # Main interaction loop
             while True:
-                # Generate questions
+                # Generate questions with AI thinking indicator
+                self.ui.print_ai_thinking("AI is generating questions")
                 questions = self._generate_questions()
                 
                 if not questions:
@@ -45,15 +46,26 @@ class ContentPlannerAgent:
                     elif choice == 's':
                         self.session.save()
                         self.ui.print_success("Progress saved!")
+                        continue  # Return to menu after save
                     continue
                 
                 # Get answers from user
                 answers = self.ui.display_questions(questions)
                 
-                # Store Q&A
-                self.session.add_qa_round(questions, answers)
+                # Filter out skipped questions (empty answers)
+                qa_pairs = [(q, a) for q, a in zip(questions, answers) if a.strip()]
                 
-                # Generate content ideas
+                if not qa_pairs:
+                    self.ui.print_warning("All questions were skipped. Please answer at least one question.")
+                    continue
+                
+                # Store Q&A (only answered questions)
+                answered_questions = [q for q, a in qa_pairs]
+                answered_answers = [a for q, a in qa_pairs]
+                self.session.add_qa_round(answered_questions, answered_answers)
+                
+                # Generate content ideas with AI thinking indicator
+                self.ui.print_ai_thinking("AI is generating content ideas")
                 ideas = self._generate_content_ideas()
                 
                 if ideas:
@@ -70,6 +82,8 @@ class ContentPlannerAgent:
                 elif choice == 's':
                     self.session.save()
                     self.ui.print_success("Progress saved!")
+                    # Return to menu after save, not to questions
+                    continue
                 # 'c' continues the loop
         
         finally:

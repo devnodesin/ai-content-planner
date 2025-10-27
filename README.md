@@ -10,9 +10,13 @@ Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fas
 
 - 🤖 **AI-powered customer perspective** - AI acts like a real customer encountering your product
 - ❓ **Natural question generation** - Questions use what, who, which, whose, when, why, where, how
-- 💡 **Automated content ideas** - Generate article titles that answer customer questions
+- ⏭️  **Skip questions** - Press Enter to skip any question you don't want to answer
+- 💡 **Structured content ideas** - Generate article titles with detailed summaries (100-150 chars)
+- 🚫 **Smart deduplication** - No duplicate or similar content ideas (70%+ similarity filtered)
+- 🎨 **Colorful interface** - Easy-to-read colored output (menu, questions, outputs, success messages)
+- 🤖 **AI thinking indicator** - See "AI Thinking..." with progress dots during generation
 - 💾 **Auto-save** every 5 minutes (silent background)
-- 📝 **Manual save** with 's' key
+- 📝 **Manual save** with 's' key (returns to menu, not questions)
 - 🔄 **Iterative rounds** - Each round builds on previous answers
 - 📊 **JSON export** for easy integration
 - ⚡ **Lightning-fast** dependency management with uv
@@ -113,12 +117,22 @@ Generated content titles are:
 4. **Choose Action**:
    - `c` - Continue with more questions (AI asks follow-up questions based on your answers)
    - `q` - Quit and save all data to `out.json`
-   - `s` - Save current progress without quitting
+   - `s` - Save current progress (returns to menu, not questions)
 
 ### Example Session
 
 ```bash
+🎯 Content Planner - Product Input
+==============================================================================
+
 Enter product name: Wireless Headphones
+
+🤖 AI Thinking...
+
+📝 Questions & Answers
+----------------------------------------------------------------------
+
+💡 Tip: Press Enter without typing to skip a question
 
 [1/5] What is this product used for?
 Your answer: Listening to music and taking calls without wires
@@ -130,23 +144,44 @@ Your answer: Commuters, fitness enthusiasts, and remote workers
 Your answer: Pair via Bluetooth, charge before first use, adjust fit for comfort
 
 [4/5] What makes this product different from others on the market?
-Your answer: 48-hour battery life and superior active noise cancellation
+Your answer: 
+
+  ⏭️  Skipped
 
 [5/5] Where can I buy this product?
 Your answer: Available on our website and Amazon, shipping worldwide
 
-Content Ideas (Round 1):
+🤖 AI Thinking...
+
+💡 Content Ideas (Round 1)
+----------------------------------------------------------------------
+
   1. How Wireless Headphones Transform Your Daily Commute
+     → Guide on using wireless headphones for commuting with noise cancellation and battery tips for all-day use.
+
   2. The Ultimate Guide to Choosing Wireless Headphones for Fitness
+     → Complete buying guide for fitness enthusiasts covering sweat resistance, secure fit, and workout-friendly features.
+
   3. 48-Hour Battery Life: Never Run Out of Music Again
+     → In-depth analysis of extended battery performance, charging tips, and real-world usage scenarios for travelers.
+
   4. Active Noise Cancellation Explained: Why It Matters for Remote Work
+     → Technical guide on ANC technology benefits for productivity, focus, and reducing distractions in home offices.
+
   5. How to Properly Pair and Set Up Your Wireless Headphones
+     → Step-by-step tutorial covering Bluetooth pairing, optimal settings, and troubleshooting common connection issues.
   ...
 
-Options:
+📋 Options:
+==============================================================================
   [c] Continue - Generate more questions
   [q] Quit - Save and exit
   [s] Save - Save current progress
+==============================================================================
+Your choice (c/q/s): s
+
+✓ Progress saved!
+
 Your choice (c/q/s): c
 ```
 
@@ -195,8 +230,14 @@ All session data is saved to `out.json`:
     }
   ],
   "content_ideas": [
-    "How Wireless Headphones Transform Your Daily Commute",
-    "Top 5 Benefits of Going Wireless for Fitness Enthusiasts"
+    {
+      "title": "How Wireless Headphones Transform Your Daily Commute",
+      "summary": "Comprehensive guide on using wireless headphones for commuting, covering noise cancellation, battery life tips, and best practices."
+    },
+    {
+      "title": "Top 5 Benefits of Going Wireless for Fitness Enthusiasts",
+      "summary": "Explore key advantages of wireless headphones during workouts, including freedom of movement and sweat resistance features."
+    }
   ],
   "last_updated": "2025-01-27T12:30:00"
 }

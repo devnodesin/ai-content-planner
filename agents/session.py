@@ -44,34 +44,45 @@ class SessionManager:
                 'timestamp': datetime.now().isoformat()
             })
 
-    def add_content_ideas(self, ideas: List[str]):
+    def add_content_ideas(self, ideas: List[Dict[str, str]]):
         """
         Add content ideas to the collection with intelligent deduplication.
         
         Args:
-            ideas: List of content ideas
+            ideas: List of content idea dictionaries with 'title' and 'summary'
         """
         for idea in ideas:
+            # Handle both old format (string) and new format (dict)
+            if isinstance(idea, str):
+                idea_dict = {'title': idea, 'summary': ''}
+            else:
+                idea_dict = idea
+            
+            title = idea_dict.get('title', '').strip()
+            if not title:
+                continue
+            
             # Check for exact duplicates
-            if idea in self.content_ideas:
+            if any(existing.get('title', '') == title for existing in self.content_ideas):
                 continue
             
             # Check for similar duplicates (case-insensitive and normalized)
-            idea_normalized = idea.lower().strip()
+            title_normalized = title.lower().strip()
             is_duplicate = False
             
             for existing_idea in self.content_ideas:
-                existing_normalized = existing_idea.lower().strip()
+                existing_title = existing_idea.get('title', '')
+                existing_normalized = existing_title.lower().strip()
                 
-                # Check if ideas are too similar (simple similarity check)
-                if idea_normalized == existing_normalized:
+                # Check if titles are too similar (simple similarity check)
+                if title_normalized == existing_normalized:
                     is_duplicate = True
                     break
                 
                 # Check if one is a substring of the other (avoiding very similar titles)
-                if len(idea_normalized) > 20 and len(existing_normalized) > 20:
+                if len(title_normalized) > 20 and len(existing_normalized) > 20:
                     # Calculate simple similarity
-                    words_new = set(idea_normalized.split())
+                    words_new = set(title_normalized.split())
                     words_existing = set(existing_normalized.split())
                     
                     if len(words_new) > 3 and len(words_existing) > 3:
@@ -84,9 +95,12 @@ class SessionManager:
                             break
             
             if not is_duplicate:
-                self.content_ideas.append(idea)
+                self.content_ideas.append({
+                    'title': title,
+                    'summary': idea_dict.get('summary', '').strip()
+                })
     
-    def get_content_ideas(self) -> List[str]:
+    def get_content_ideas(self) -> List[Dict[str, str]]:
         """Get all unique content ideas."""
         return self.content_ideas
 

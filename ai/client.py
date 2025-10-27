@@ -127,7 +127,7 @@ Return ONLY the questions, one per line, numbered 1-{Config.MAX_QUESTIONS_PER_RO
             print(f"Error generating questions: {e}")
             return []
 
-    def generate_content_ideas(self, product_name: str, qa_pairs: List[Dict[str, str]], existing_ideas: List[str] = None) -> List[str]:
+    def generate_content_ideas(self, product_name: str, qa_pairs: List[Dict[str, str]], existing_ideas: List[Dict[str, str]] = None) -> List[Dict[str, str]]:
         """
         Generate content/article ideas based on product and Q&A.
         
@@ -137,7 +137,7 @@ Return ONLY the questions, one per line, numbered 1-{Config.MAX_QUESTIONS_PER_RO
             existing_ideas: Previously generated content ideas to avoid duplicates
             
         Returns:
-            List of content ideas (titles only)
+            List of content ideas with title and summary
         """
         if not self.is_available or not self.client:
             return []
@@ -152,17 +152,17 @@ Return ONLY the questions, one per line, numbered 1-{Config.MAX_QUESTIONS_PER_RO
             if existing_ideas and len(existing_ideas) > 0:
                 existing_text = f"\n\nPreviously generated content ideas (DO NOT create similar or duplicate ideas):\n"
                 for idea in existing_ideas:
-                    existing_text += f"- {idea}\n"
+                    existing_text += f"- {idea.get('title', idea)}\n"
 
             prompt = f"""You are a content strategist for an e-commerce company selling "{product_name}".
 
-Your goal: Generate exactly {Config.CONTENT_IDEAS_PER_ROUND} HIGH-QUALITY, HIGH-PERFORMING article/blog title ideas that will convert potential customers into buyers.
+Your goal: Generate exactly {Config.CONTENT_IDEAS_PER_ROUND} HIGH-QUALITY, HIGH-PERFORMING article/blog ideas that will convert potential customers into buyers.
 
 Customer Q&A Insights:
 {qa_text}
 {existing_text}
 
-Create content titles that:
+Create content ideas that:
 1. **Target Different Buyer Journey Stages**:
    - Awareness: Educational content (What, Why, How)
    - Consideration: Comparison and benefits (vs, reasons, features)
@@ -206,7 +206,12 @@ CRITICAL REQUIREMENTS:
 - Ensure each title provides distinct value
 - Make titles specific, not generic
 
-Return ONLY the titles, one per line, numbered 1-{Config.CONTENT_IDEAS_PER_ROUND}. No commentary or explanation."""
+OUTPUT FORMAT (IMPORTANT):
+Return content ideas in this exact JSON format, one per line:
+{{"title": "Article Title Here", "summary": "Brief 100-150 char description of what this article should contain"}}
+
+Generate exactly {Config.CONTENT_IDEAS_PER_ROUND} ideas, numbered 1-{Config.CONTENT_IDEAS_PER_ROUND}.
+Each summary should be 100-150 characters and describe the article's key points."""
 
             messages = [{'role': 'user', 'content': prompt}]
             
@@ -214,15 +219,40 @@ Return ONLY the titles, one per line, numbered 1-{Config.CONTENT_IDEAS_PER_ROUND
             for part in self.client.chat(Config.OLLAMA_MODEL, messages=messages, stream=True):
                 response += part['message']['content']
 
-            # Parse ideas from response
+            # Parse ideas from response (expecting JSON format)
+            import json
+            import re
+            
             ideas = []
-            for line in response.strip().split('\n'):
-                line = line.strip()
-                if line:
-                    # Remove numbering
-                    line = line.lstrip('0123456789.)- ')
-                    if line and len(line) > 10:
-                        ideas.append(line)
+            # Try to extract JSON objects from the response
+            json_pattern = r'\{[^}]+\}'
+            matches = re.findall(json_pattern, response, re.DOTALL)
+            
+            for match in matches:
+                try:
+                    idea_obj = json.loads(match)
+                    if 'title' in idea_obj:
+                        # Ensure summary exists and is within character limit
+                        summary = idea_obj.get('summary', '')
+                        if len(summary) > 150:
+                            summary = summary[:147] + '...'
+                        elif len(summary) < 100 and summary:
+                            # If too short, it's acceptable but flag it
+                            pass
+                        
+                        ideas.append({
+                            'title': idea_obj['title'].strip(),
+                            'summary': summary.strip()
+                        })
+                except json.JSONDecodeError:
+                    # If JSON parsing fails, try to extract title from plain text
+                    line = match.strip()
+                    if len(line) > 10:
+                        # Fallback: create simple structure
+                        ideas.append({
+                            'title': line.lstrip('0123456789.)- '),
+                            'summary': 'Content article about this topic.'
+                        })
 
             return ideas[:Config.CONTENT_IDEAS_PER_ROUND]
 

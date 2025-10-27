@@ -39,12 +39,17 @@ def test_add_qa_round():
 def test_add_content_ideas():
     """Test adding content ideas with deduplication."""
     session = SessionManager()
-    ideas = ["Idea 1", "Idea 2", "Idea 1"]  # Exact duplicate
+    ideas = [
+        {"title": "Idea 1", "summary": "Summary 1"},
+        {"title": "Idea 2", "summary": "Summary 2"},
+        {"title": "Idea 1", "summary": "Summary 1"}  # Exact duplicate
+    ]
     
     session.add_content_ideas(ideas)
     
     # Should not add exact duplicates
     assert len(session.content_ideas) == 2
+    assert session.content_ideas[0]['title'] == "Idea 1"
 
 
 def test_add_similar_content_ideas():
@@ -52,16 +57,16 @@ def test_add_similar_content_ideas():
     session = SessionManager()
     
     # Add first batch
-    session.add_content_ideas(["How to Use Wireless Headphones for Running"])
+    session.add_content_ideas([{"title": "How to Use Wireless Headphones for Running", "summary": "Guide for runners"}])
     
     # Try to add similar idea (should be filtered out)
-    session.add_content_ideas(["How to use wireless headphones for running"])  # Case difference
+    session.add_content_ideas([{"title": "How to use wireless headphones for running", "summary": "Another guide"}])  # Case difference
     
     # Should only have 1 (case-insensitive duplicate)
     assert len(session.content_ideas) == 1
     
     # Add a different idea
-    session.add_content_ideas(["Best Wireless Headphones for Gaming"])
+    session.add_content_ideas([{"title": "Best Wireless Headphones for Gaming", "summary": "Gaming headphones"}])
     
     # Should have 2 now
     assert len(session.content_ideas) == 2
@@ -70,12 +75,16 @@ def test_add_similar_content_ideas():
 def test_get_content_ideas():
     """Test getting content ideas."""
     session = SessionManager()
-    ideas = ["Idea 1", "Idea 2"]
+    ideas = [
+        {"title": "Idea 1", "summary": "Summary 1"},
+        {"title": "Idea 2", "summary": "Summary 2"}
+    ]
     session.add_content_ideas(ideas)
     
     retrieved = session.get_content_ideas()
     assert len(retrieved) == 2
-    assert "Idea 1" in retrieved
+    assert retrieved[0]['title'] == "Idea 1"
+    assert retrieved[0]['summary'] == "Summary 1"
 
 
 def test_save_and_load():
@@ -86,7 +95,7 @@ def test_save_and_load():
         
         session.set_product("Test Product")
         session.add_qa_round(["Q1"], ["A1"])
-        session.add_content_ideas(["Idea 1"])
+        session.add_content_ideas([{"title": "Idea 1", "summary": "Summary 1"}])
         
         # Save
         assert session.save() is True
@@ -100,3 +109,4 @@ def test_save_and_load():
         assert new_session.product_name == "Test Product"
         assert len(new_session.qa_history) == 1
         assert len(new_session.content_ideas) == 1
+        assert new_session.content_ideas[0]['title'] == "Idea 1"

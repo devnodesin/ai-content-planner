@@ -16,7 +16,7 @@ dist/
 .env
 
 # Output
-out.json
+out_content_ideas.json
 
 # Testing
 .pytest_cache/

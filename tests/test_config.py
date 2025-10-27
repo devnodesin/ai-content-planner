@@ -10,7 +10,7 @@ def test_config_defaults():
     assert Config.MAX_QUESTIONS_PER_ROUND == 5
     assert Config.CONTENT_IDEAS_PER_ROUND == 10
     assert Config.AUTOSAVE_INTERVAL_SECONDS == 300
-    assert Config.OUTPUT_FILE == 'out.json'
+    assert Config.OUTPUT_FILE == 'out_content_ideas.json'
 
 
 def test_config_api_check():

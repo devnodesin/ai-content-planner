@@ -7,7 +7,7 @@ For all workflow, technical requirements, and implementation details, refer to [
 - Use the latest Python best practices.
 - Always leverage AI for question and idea generation.
 - Periodically autosave session data if the user works for a long time.
-- On quit, save all session data to `out.json`.
+- On quit, save all session data to `out_content_ideas.json`.
 - On continue, generate more questions based on context and user input.
 
 ## Folder Structure
@@ -20,7 +20,7 @@ content-planner/
 ├── utils/         # Utility functions
 ├── main.py        # Main entry point
 ├── requirements.txt
-├── out.json       # Output file for session data
+├── out_content_ideas.json       # Output file for session data
 ├── AGENTS.md
 ├── REQUIRMENTS.md
 ```

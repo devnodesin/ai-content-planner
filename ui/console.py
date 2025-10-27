@@ -207,7 +207,7 @@ class ConsoleUI:
         ConsoleUI.print_header("❓ Help Menu")
         print(f"{Colors.BRIGHT_WHITE}Available Commands:{Colors.RESET}")
         ConsoleUI.print_menu_option('c', 'Continue to next round (generate more questions)')
-        ConsoleUI.print_menu_option('q', 'Quit and save all data to out.json')
+        ConsoleUI.print_menu_option('q', 'Quit and save all data to out_content_ideas.json')
         ConsoleUI.print_menu_option('s', 'Save current progress without quitting')
         print(f"\n{Colors.BRIGHT_WHITE}Features:{Colors.RESET}")
         print(f"  {Colors.DIM}• Auto-save every 5 minutes (silent background){Colors.RESET}")

@@ -18,7 +18,7 @@ class Config:
     CONTENT_IDEAS_PER_ROUND: int = int(os.getenv('CONTENT_IDEAS_PER_ROUND', '10'))
     AUTOSAVE_INTERVAL_SECONDS: int = int(os.getenv('AUTOSAVE_INTERVAL_SECONDS', '300'))
     
-    OUTPUT_FILE: str = 'out.json'
+    OUTPUT_FILE: str = 'out_content_ideas.json'
 
     @classmethod
     def is_api_configured(cls) -> bool:

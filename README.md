@@ -116,7 +116,7 @@ Generated content titles are:
 3. **Review Content Ideas** - Get 10 article title ideas that address customer concerns
 4. **Choose Action**:
    - `c` - Continue with more questions (AI asks follow-up questions based on your answers)
-   - `q` - Quit and save all data to `out.json`
+   - `q` - Quit and save all data to `out_content_ideas.json`
    - `s` - Save current progress (returns to menu, not questions)
 
 ### Example Session
@@ -215,7 +215,7 @@ AUTOSAVE_INTERVAL_SECONDS=300
 
 ## Output Format
 
-All session data is saved to `out.json`:
+All session data is saved to `out_content_ideas.json`:
 
 ```json
 {

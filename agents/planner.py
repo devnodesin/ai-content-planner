@@ -32,7 +32,22 @@ class ContentPlannerAgent:
         
         try:
             # Main interaction loop
+            first_round = True
             while True:
+                # For first round, automatically continue; for subsequent rounds, show menu first
+                if not first_round:
+                    choice = self.ui.get_user_choice()
+                    
+                    if choice == 'q':
+                        break
+                    elif choice == 's':
+                        self.session.save()
+                        self.ui.print_success("Progress saved!")
+                        continue  # Go back to menu
+                    # 'c' continues to generate questions
+                
+                first_round = False
+                
                 # Generate questions with AI thinking indicator
                 self.ui.print_ai_thinking("AI is generating questions")
                 questions = self._generate_questions()
@@ -40,13 +55,6 @@ class ContentPlannerAgent:
                 if not questions:
                     self.ui.print_error("Could not generate questions. Please check API configuration.")
                     self.ui.show_help_menu()
-                    choice = self.ui.get_user_choice()
-                    if choice == 'q':
-                        break
-                    elif choice == 's':
-                        self.session.save()
-                        self.ui.print_success("Progress saved!")
-                        continue  # Return to menu after save
                     continue
                 
                 # Get answers from user
@@ -73,18 +81,6 @@ class ContentPlannerAgent:
                     self.ui.display_content_ideas(ideas, self.session.round_count)
                 else:
                     self.ui.print_warning("Could not generate content ideas.")
-                
-                # Get user choice
-                choice = self.ui.get_user_choice()
-                
-                if choice == 'q':
-                    break
-                elif choice == 's':
-                    self.session.save()
-                    self.ui.print_success("Progress saved!")
-                    # Return to menu after save, not to questions
-                    continue
-                # 'c' continues the loop
         
         finally:
             # Stop autosave and save final state

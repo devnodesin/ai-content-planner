@@ -91,7 +91,7 @@ def test_save_and_load():
     """Test saving and loading session."""
     with tempfile.TemporaryDirectory() as tmpdir:
         session = SessionManager()
-        session.output_file = Path(tmpdir) / 'test_out.json'
+        session.output_file = Path(tmpdir) / 'test_out_content_ideas.json'
         
         session.set_product("Test Product")
         session.add_qa_round(["Q1"], ["A1"])

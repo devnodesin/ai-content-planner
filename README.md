@@ -8,7 +8,7 @@ Uses Ollama Cloud to generate smart customer questions and unique content ideas 
 
 Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fast, reliable dependency management.
 
-📋 **For technical specifications, architecture, and detailed design information, see [SPEC.md](./SPEC.md)**
+📋 **For technical specifications, architecture, and detailed design information, see [SPEC.md](./spec/SPEC.md)**
 
 ## Features
 
@@ -87,7 +87,7 @@ uv add package-name@latest
 
 The AI acts as a smart customer evaluating your product, asking genuine questions that real customers would ask before making a purchase. It uses previous Q&A context to ask follow-up questions for unclear areas and explores new product aspects. Content ideas are unique, deduplicated, and returned in JSON format.
 
-**See [SPEC.md](./SPEC.md) for detailed workflow, question logic, and output format.**
+**See [SPEC.md](./spec/SPEC.md) for detailed workflow, question logic, and output format.**
 
 ---
 
@@ -177,7 +177,7 @@ Create a `.env` file with your Ollama API key:
 OLLAMA_API_KEY=your_api_key_here
 ```
 
-**For all configuration options and available models, see [SPEC.md](./SPEC.md)**
+**For all configuration options and available models, see [SPEC.md](./spec/SPEC.md)**
 
 ---
 
@@ -202,7 +202,7 @@ All session data is saved to `out_content_ideas.json` in structured JSON format:
 }
 ```
 
-**For detailed output format specification, see [SPEC.md](./SPEC.md)**
+**For detailed output format specification, see [SPEC.md](./spec/SPEC.md)**
 
 
 
@@ -253,7 +253,7 @@ uv run pytest tests/ -v
 - Ollama Cloud API key (free at [ollama.com](https://ollama.com/))
 - Internet connection for AI features
 
-**For detailed technical specifications, see [SPEC.md](./SPEC.md)**
+**For detailed technical specifications, see [SPEC.md](./spec/SPEC.md)**
 
 ---
 
@@ -265,7 +265,7 @@ MIT
 
 ## Contributing
 
-Contributions are welcome! Please see [SPEC.md](./SPEC.md) for coding standards and technical requirements.
+Contributions are welcome! Please see [SPEC.md](./spec/SPEC.md) for coding standards and technical requirements.
 
 ---
 

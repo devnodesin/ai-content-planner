@@ -1,6 +1,6 @@
 # AGENTS.md
 
-For all workflow, technical requirements, and implementation details, refer to [`SPEC.md`](./SPEC.md).
+For all workflow, technical requirements, and implementation details, refer to [`SPEC.md`](./spec/SPEC.md).
 
 ## Agent Guidance
 - Follow the workflow and architecture described in `SPEC.md`.
@@ -22,7 +22,8 @@ content-planner/
 ├── requirements.txt
 ├── out_content_ideas.json       # Output file for session data
 ├── AGENTS.md
-├── SPEC.md
+├── spec/
+│   └── SPEC.md
 ```
 
 ## Coding Rules
@@ -36,7 +37,7 @@ content-planner/
 - Handle errors gracefully, especially with external API calls and AI responses.
 
 ### Testing
-Refer to [`SPEC.md`](./SPEC.md) for detailed testing instructions, requirements, and output format.
+Refer to [`SPEC.md`](./spec/SPEC.md) for detailed testing instructions, requirements, and output format.
 
 ## Anti-Patterns / Do Nots
 - Do not duplicate requirements or workflow details already present in `SPEC.md`.
@@ -52,5 +53,5 @@ Refer to [`SPEC.md`](./SPEC.md) for detailed testing instructions, requirements,
 - Update tests for any code changes.
 
 ## Reference
-- For all workflow, technical requirements, and implementation details, refer to [`SPEC.md`](./SPEC.md).
+-- For all workflow, technical requirements, and implementation details, refer to [`SPEC.md`](./spec/SPEC.md).
 - For more on AGENTS.md conventions, see [agents.md](https://agents.md/) and [agentdotmd.github.io](https://agentdotmd.github.io/website/)

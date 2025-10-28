@@ -42,14 +42,14 @@ class ContentPlannerAgent:
                         break
                     elif choice == 's':
                         self.session.save()
-                        self.ui.print_success("Progress saved!")
+                        self.ui.print_success("Progress saved!", file_name=Config.OUTPUT_FILE)
                         continue  # Go back to menu
                     # 'c' continues to generate questions
                 
                 first_round = False
                 
                 # Generate questions with AI thinking indicator
-                self.ui.print_ai_thinking("AI is generating questions")
+                self.ui.print_ai_thinking("AI is generating questions", model_name=Config.OLLAMA_MODEL)
                 questions = self._generate_questions()
                 
                 if not questions:
@@ -73,7 +73,7 @@ class ContentPlannerAgent:
                 self.session.add_qa_round(answered_questions, answered_answers)
                 
                 # Generate content ideas with AI thinking indicator
-                self.ui.print_ai_thinking("AI is generating content ideas")
+                self.ui.print_ai_thinking("AI is generating content ideas", model_name=Config.OLLAMA_MODEL)
                 ideas = self._generate_content_ideas()
                 
                 if ideas:

@@ -63,9 +63,12 @@ class ConsoleUI:
         print(f"{Colors.BRIGHT_BLUE}ℹ  {text}{Colors.RESET}")
 
     @staticmethod
-    def print_success(text: str):
+    def print_success(text: str, file_name: Optional[str] = None):
         """Print success message in green."""
-        print(f"{Colors.BRIGHT_GREEN}{Colors.BOLD}✓ {text}{Colors.RESET}")
+        if file_name:
+            print(f"{Colors.BRIGHT_GREEN}{Colors.BOLD}✓ {text} ({file_name}){Colors.RESET}")
+        else:
+            print(f"{Colors.BRIGHT_GREEN}{Colors.BOLD}✓ {text}{Colors.RESET}")
 
     @staticmethod
     def print_error(text: str):
@@ -78,9 +81,12 @@ class ConsoleUI:
         print(f"{Colors.BRIGHT_YELLOW}⚠  {text}{Colors.RESET}")
     
     @staticmethod
-    def print_ai_thinking(text: str = "AI Thinking"):
+    def print_ai_thinking(text: str = "AI Thinking", model_name: Optional[str] = None):
         """Print AI thinking message with animation."""
-        print(f"{Colors.BRIGHT_MAGENTA}🤖 {text}", end='', flush=True)
+        if model_name:
+            print(f"{Colors.BRIGHT_MAGENTA}🤖 {text} (model: {model_name})", end='', flush=True)
+        else:
+            print(f"{Colors.BRIGHT_MAGENTA}🤖 {text}", end='', flush=True)
         for _ in range(3):
             time.sleep(0.3)
             print('.', end='', flush=True)
@@ -186,12 +192,9 @@ class ConsoleUI:
         Returns:
             User choice: 'c', 'q', or 's'
         """
-        print(f"\n{Colors.CYAN}{Colors.BOLD}{'=' * 70}{Colors.RESET}")
-        print(f"{Colors.CYAN}{Colors.BOLD}📋 Options:{Colors.RESET}")
-        ConsoleUI.print_menu_option('c', 'Continue - Generate more questions')
-        ConsoleUI.print_menu_option('q', 'Quit - Save and exit')
-        ConsoleUI.print_menu_option('s', 'Save - Save current progress')
-        print(f"{Colors.CYAN}{Colors.BOLD}{'=' * 70}{Colors.RESET}")
+        print(f"\n{Colors.CYAN}{Colors.BOLD}{'=' * 70}")
+        print(f"📋 Options: [c] Continue, [s] Save, [q] Quit")
+        print(f"{'=' * 70}{Colors.RESET}")
         
         while True:
             choice = ConsoleUI.get_input("Your choice (c/q/s)", allow_empty=True).lower()

@@ -58,6 +58,9 @@ uv run python main.py
 ### Run Tests
 
 ```bash
+# Install pytest
+uv add --dev pytest
+
 # Run all tests
 uv run pytest tests/ -v
 

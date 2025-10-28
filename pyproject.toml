@@ -23,3 +23,8 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["agents", "ai", "ui", "utils", "main.py"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]

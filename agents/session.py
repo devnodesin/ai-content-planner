@@ -157,6 +157,31 @@ class SessionManager:
             print(f"Error loading session: {e}")
             return False
 
+    def get_session_summary(self) -> Dict[str, Any]:
+        """
+        Get session summary from the output file without loading it.
+        
+        Returns:
+            Dictionary with session summary or None if file doesn't exist
+        """
+        if not self.output_file.exists():
+            return None
+
+        try:
+            with open(self.output_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            return {
+                'product_name': data.get('product_name', ''),
+                'rounds': data.get('rounds', 0),
+                'qa_count': len(data.get('qa_history', [])),
+                'ideas_count': len(data.get('content_ideas', [])),
+                'last_updated': data.get('last_updated', 'Unknown')
+            }
+        except Exception as e:
+            print(f"Error reading session summary: {e}")
+            return None
+
     def _autosave_worker(self):
         """Background worker for autosave."""
         while self.autosave_enabled:

@@ -13,6 +13,7 @@ Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fas
 ## Features
 
 - 🤖 **AI-powered customer perspective** - AI acts like a real customer, asking genuine questions before purchase
+- 📂 **Session Resume** - Load previous sessions or start new ones with interactive arrow-key menu
 - ❓ **Smart question generation** - Diverse question types (what, who, which, whose, when, why, where, how)
 - ⏭️ **Skip questions** - Press Enter to skip any question you don't want to answer
 - 💡 **Structured content ideas** - Article titles with 100-150 char summaries, returned in JSON format
@@ -22,7 +23,7 @@ Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fas
 - 💾 **Auto-save** every 5 minutes (silent background)
 - 📝 **Manual save** with 's' key (returns to menu, not questions)
 - 🎨 **Colorful interface** - Easy-to-read colored output (menu, questions, outputs, success messages)
-- 🤖 **AI thinking indicator** - See "AI Thinking..." with progress dots during generation
+- 🤖 **AI model display** - See which AI model is being used during generation
 - ⚡ **Lightning-fast** dependency management with uv
 - 🐍 **Python 3.13** (latest stable, supported until 2029)
 
@@ -93,6 +94,35 @@ The AI acts as a smart customer evaluating your product, asking genuine question
 
 ## Usage
 
+### Session Resume
+
+On startup, if an existing session file (`out_content_ideas.json`) is found, you'll see:
+
+```bash
+📂 Existing Session Found
+----------------------------------------------------------------------
+
+Product/Topic: Wireless Headphones
+Rounds Completed: 3
+Q&A Pairs: 15
+Content Ideas: 30
+Last Updated: 2025-01-27T10:30:00
+
+📂 Session Resume
+==============================================================================
+  ▶ Load existing session: Wireless Headphones
+    Start a new session with a new product
+==============================================================================
+
+Use ↑/↓ arrow keys to navigate, Enter to select, Esc to exit
+```
+
+- **Navigate** with arrow keys (↑/↓)
+- **Select** with Enter
+- **Exit** with Esc (confirms before exiting)
+
+### Main Workflow
+
 1. **Enter Product Name** - Type your product name (e.g., "Wireless Headphones")
 2. **Answer Customer Questions** - Respond to 5 AI-generated questions from a customer perspective
 3. **Review Content Ideas** - Get 10 article title ideas that address customer concerns
@@ -109,7 +139,7 @@ The AI acts as a smart customer evaluating your product, asking genuine question
 
 Enter product name: Wireless Headphones
 
-🤖 AI Thinking...
+🤖 AI is generating questions (model: deepseek-v3.1:671b-cloud)...
 
 📝 Questions & Answers
 ----------------------------------------------------------------------
@@ -133,7 +163,7 @@ Your answer:
 [5/5] Where can I buy this product?
 Your answer: Available on our website and Amazon, shipping worldwide
 
-🤖 AI Thinking...
+🤖 AI is generating content ideas (model: deepseek-v3.1:671b-cloud)...
 
 💡 Content Ideas (Round 1)
 ----------------------------------------------------------------------
@@ -154,15 +184,12 @@ Your answer: Available on our website and Amazon, shipping worldwide
      → Step-by-step tutorial covering Bluetooth pairing, optimal settings, and troubleshooting common connection issues.
   ...
 
-📋 Options:
-==============================================================================
-  [c] Continue - Generate more questions
-  [q] Quit - Save and exit
-  [s] Save - Save current progress
-==============================================================================
+======================================================================
+📋 Options: [c] Continue, [s] Save, [q] Quit
+======================================================================
 Your choice (c/q/s): s
 
-✓ Progress saved!
+✓ Progress saved! (out_content_ideas.json)
 
 Your choice (c/q/s): c
 ```

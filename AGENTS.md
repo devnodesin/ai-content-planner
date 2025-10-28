@@ -26,7 +26,19 @@ content-planner/
 │   └── SPEC.md
 ```
 
+
 ## Coding Rules
+- Always use [uv](https://docs.astral.sh/uv/) for building, running, testing, and managing dependencies in this project.
+- All build, run, and test commands must use uv:
+	- Install dependencies: `uv sync`
+	- Run the app: `uv run python main.py`
+	- Run all tests: `uv run pytest tests/ -v`
+	- Run specific test file: `uv run pytest tests/test_session.py -v`
+	- Add runtime dependency: `uv add package-name`
+	- Add dev dependency: `uv add --dev package-name`
+	- Update all dependencies: `uv sync --upgrade`
+	- Update specific package: `uv add package-name@latest`
+- Do not use pip, python -m pip, or other package managers for this project.
 - Follow PEP 8 for Python code style
 - Use type hints and docstrings for all functions and classes
 - Prefer modern Python features (f-strings, pathlib, dataclasses, etc.)

@@ -4,6 +4,13 @@ import sys
 import time
 from typing import List, Optional
 
+# Platform-specific keyboard input handling
+if sys.platform == 'win32':
+    import msvcrt
+else:
+    import tty
+    import termios
+
 
 class Colors:
     """ANSI color codes for terminal output."""
@@ -231,3 +238,128 @@ class ConsoleUI:
         print("  3. Set OLLAMA_API_KEY in .env file")
         print("  4. Optionally set OLLAMA_MODEL (default: deepseek-v3.1:671b-cloud)")
         ConsoleUI.show_help_menu()
+
+    @staticmethod
+    def _get_key():
+        """
+        Get a single keypress from the user (cross-platform).
+        
+        Returns:
+            String representing the key pressed
+        """
+        if sys.platform == 'win32':
+            # Windows
+            key = msvcrt.getch()
+            # Handle special keys (arrow keys, etc.)
+            if key in (b'\x00', b'\xe0'):
+                key = msvcrt.getch()
+                if key == b'H':  # Up arrow
+                    return 'up'
+                elif key == b'P':  # Down arrow
+                    return 'down'
+                elif key == b'\x1b':  # Esc
+                    return 'esc'
+            elif key == b'\r':  # Enter
+                return 'enter'
+            elif key == b'\x1b':  # Esc
+                return 'esc'
+            else:
+                try:
+                    return key.decode('utf-8')
+                except:
+                    return None
+        else:
+            # Unix/Linux/Mac
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                tty.setraw(fd)
+                ch = sys.stdin.read(1)
+                
+                # Check for escape sequences (arrow keys)
+                if ch == '\x1b':
+                    ch2 = sys.stdin.read(1)
+                    if ch2 == '[':
+                        ch3 = sys.stdin.read(1)
+                        if ch3 == 'A':  # Up arrow
+                            return 'up'
+                        elif ch3 == 'B':  # Down arrow
+                            return 'down'
+                    return 'esc'
+                elif ch == '\r' or ch == '\n':  # Enter
+                    return 'enter'
+                else:
+                    return ch
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return None
+
+    @staticmethod
+    def display_interactive_menu(title: str, options: List[str], selected_index: int = 0) -> int:
+        """
+        Display an interactive menu with arrow key navigation.
+        
+        Args:
+            title: Menu title
+            options: List of menu options
+            selected_index: Initially selected option index
+            
+        Returns:
+            Index of selected option, or -1 if ESC was pressed
+        """
+        current_selection = selected_index
+        
+        while True:
+            # Clear previous output (simple approach)
+            print('\n' * 2)
+            
+            # Display title
+            ConsoleUI.print_header(title)
+            
+            # Display options with highlighting
+            for i, option in enumerate(options):
+                if i == current_selection:
+                    # Highlight selected option
+                    print(f"  {Colors.BRIGHT_CYAN}{Colors.BOLD}▶ {option}{Colors.RESET}")
+                else:
+                    print(f"    {Colors.DIM}{option}{Colors.RESET}")
+            
+            print(f"\n{Colors.DIM}Use ↑/↓ arrow keys to navigate, Enter to select, Esc to exit{Colors.RESET}")
+            
+            # Get user input
+            key = ConsoleUI._get_key()
+            
+            if key == 'up':
+                current_selection = (current_selection - 1) % len(options)
+            elif key == 'down':
+                current_selection = (current_selection + 1) % len(options)
+            elif key == 'enter':
+                print()  # Add newline
+                return current_selection
+            elif key == 'esc':
+                # Confirm exit
+                print(f"\n{Colors.YELLOW}Are you sure you want to exit? (y/n): {Colors.RESET}", end='', flush=True)
+                confirm = ConsoleUI._get_key()
+                if confirm and confirm.lower() == 'y':
+                    return -1
+
+    @staticmethod
+    def display_session_summary(product_name: str, rounds: int, qa_count: int, ideas_count: int, last_updated: str):
+        """
+        Display a summary of an existing session.
+        
+        Args:
+            product_name: Name of the product
+            rounds: Number of rounds completed
+            qa_count: Number of Q&A pairs
+            ideas_count: Number of content ideas
+            last_updated: Last update timestamp
+        """
+        ConsoleUI.print_section("📂 Existing Session Found")
+        print(f"{Colors.BRIGHT_WHITE}{Colors.BOLD}Product/Topic:{Colors.RESET} {Colors.CYAN}{product_name}{Colors.RESET}")
+        print(f"{Colors.BRIGHT_WHITE}{Colors.BOLD}Rounds Completed:{Colors.RESET} {rounds}")
+        print(f"{Colors.BRIGHT_WHITE}{Colors.BOLD}Q&A Pairs:{Colors.RESET} {qa_count}")
+        print(f"{Colors.BRIGHT_WHITE}{Colors.BOLD}Content Ideas:{Colors.RESET} {ideas_count}")
+        print(f"{Colors.BRIGHT_WHITE}{Colors.BOLD}Last Updated:{Colors.RESET} {Colors.DIM}{last_updated}{Colors.RESET}")
+        print()
+

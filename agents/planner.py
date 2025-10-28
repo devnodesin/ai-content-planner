@@ -23,9 +23,48 @@ class ContentPlannerAgent:
             self.ui.show_api_error()
             # Continue anyway as per requirements
         
-        # Get product name
-        product_name = self.ui.get_product_name()
-        self.session.set_product(product_name)
+        # Check for existing session
+        session_summary = self.session.get_session_summary()
+        
+        if session_summary and session_summary.get('product_name'):
+            # Display session summary
+            self.ui.display_session_summary(
+                product_name=session_summary['product_name'],
+                rounds=session_summary['rounds'],
+                qa_count=session_summary['qa_count'],
+                ideas_count=session_summary['ideas_count'],
+                last_updated=session_summary['last_updated']
+            )
+            
+            # Show interactive menu
+            menu_options = [
+                f"Load existing session: {session_summary['product_name']}",
+                "Start a new session with a new product"
+            ]
+            
+            choice = self.ui.display_interactive_menu(
+                "📂 Session Resume",
+                menu_options
+            )
+            
+            if choice == -1:  # ESC pressed
+                self.ui.print_info("Goodbye!")
+                return
+            elif choice == 0:  # Load existing session
+                if self.session.load():
+                    self.ui.print_success(f"Session loaded: {self.session.product_name}")
+                    self.ui.print_info(f"Continuing from Round {self.session.round_count}")
+                else:
+                    self.ui.print_error("Failed to load session. Starting new session.")
+                    product_name = self.ui.get_product_name()
+                    self.session.set_product(product_name)
+            else:  # Start new session
+                product_name = self.ui.get_product_name()
+                self.session.set_product(product_name)
+        else:
+            # No existing session, get product name
+            product_name = self.ui.get_product_name()
+            self.session.set_product(product_name)
         
         # Start autosave
         self.session.start_autosave()

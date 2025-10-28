@@ -13,6 +13,7 @@ Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fas
 ## Features
 
 - 🤖 **AI-powered customer perspective** - AI acts like a real customer, asking genuine questions before purchase
+- 📄 **Context File Generator** - Convert .md, .json files, or web URLs into standardized context format
 - 📂 **Session Resume** - Load previous sessions or start new ones with interactive arrow-key menu
 - ❓ **Smart question generation** - Diverse question types (what, who, which, whose, when, why, where, how)
 - ⏭️ **Skip questions** - Press Enter to skip any question you don't want to answer
@@ -83,6 +84,43 @@ uv sync --upgrade
 # Update specific package
 uv add package-name@latest
 ```
+
+---
+
+## Context File Generator
+
+Generate standardized markdown context files from various input sources (`.md`, `.json`, web URLs) for use with the content planner.
+
+### Quick Usage
+
+```bash
+# From a markdown file
+uv run python tools/generate_context.py product.md
+
+# From a JSON file with custom output name
+uv run python tools/generate_context.py data.json --output custom_context
+
+# From a web URL with preview (HTML auto-converted to markdown)
+uv run python tools/generate_context.py https://example.com/api/product --preview
+
+# Show help
+uv run python tools/generate_context.py --help
+```
+
+### Features
+- Accepts `.md` files, `.json` files, or web URLs
+- Validates and parses source data
+- Converts to standardized markdown format
+- **Automatic HTML to markdown conversion** for web URLs
+- **Removes unwanted sections**: header, footer, nav, aside, sidebar
+- **Extracts main content only** for clean, AI-friendly output
+- Smart file handling (overwrite protection, auto-numbering)
+- Optional preview before saving
+- Comprehensive error handling
+
+**📖 Full documentation:** [docs/GENERATE_CONTEXT.md](docs/GENERATE_CONTEXT.md)  
+**⚡ Quick reference:** [spec/GENERATE_CONTEXT_QUICK_REF.md](spec/GENERATE_CONTEXT_QUICK_REF.md)  
+**📋 Implementation details:** [spec/GENERATE_CONTEXT_IMPLEMENTATION.md](spec/GENERATE_CONTEXT_IMPLEMENTATION.md)
 
 ---
 

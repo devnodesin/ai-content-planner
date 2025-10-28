@@ -87,19 +87,15 @@ As a customer, you want to understand:
 - What this product is and what it does
 - Who it's for and how to use it
 - What makes it special or different
-- Practical details (price, availability, options)
+- Practical details (availability, options)
 - Why you should buy it
 
 Use diverse question types (what, who, which, whose, when, why, where, how) such as:
 - "What is this product used for?"
 - "Who is this product designed for?"
-- "How do I use this product?"
-- "What makes this product different from others?"
+- "How to use this product?"
 - "Where can I buy this product?"
-- "When will it be available?"
-- "Why should I choose this product?"
 - "What sizes/colors/versions are available?"
-- "How much does it cost?"
 
 Do NOT make assumptions about the product. Only ask genuine customer questions.
 

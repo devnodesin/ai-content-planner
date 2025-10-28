@@ -1,14 +1,14 @@
 # AGENTS.md
 
-For all workflow, technical requirements, and implementation details, refer to [`REQUIRMENTS.md`](./REQUIRMENTS.md).
+For all workflow, technical requirements, and implementation details, refer to [`SPEC.md`](./SPEC.md).
 
 ## Agent Guidance
-- Follow the workflow and architecture described in `REQUIRMENTS.md`.
+- Follow the workflow and architecture described in `SPEC.md`.
 - Use the latest Python best practices.
-- Always leverage AI for question and idea generation.
+- Always leverage AI for question and idea generation using Ollama Cloud.
 - Periodically autosave session data if the user works for a long time.
-- On quit, save all session data to `out_content_ideas.json`.
-- On continue, generate more questions based on context and user input.
+- On quit, save all session data to `out_content_ideas.json` (JSON format: product name, Q&A, content ideas).
+- On continue, generate more questions based on previous Q&A context, focusing on follow-up and unexplored areas.
 
 ## Folder Structure
 Recommended project structure:
@@ -22,7 +22,7 @@ content-planner/
 ├── requirements.txt
 ├── out_content_ideas.json       # Output file for session data
 ├── AGENTS.md
-├── REQUIRMENTS.md
+├── SPEC.md
 ```
 
 ## Coding Rules
@@ -33,13 +33,13 @@ content-planner/
 - Use descriptive variable and function names
 - Do not store secrets or API keys in code; always use environment variables.
 - Validate and sanitize all user input.
-- Handle errors gracefully, especially with external API calls.
+- Handle errors gracefully, especially with external API calls and AI responses.
 
 ### Testing
-Refer to [`REQUIRMENTS.md`](./REQUIRMENTS.md) for detailed testing instructions and requirements.
+Refer to [`SPEC.md`](./SPEC.md) for detailed testing instructions, requirements, and output format.
 
 ## Anti-Patterns / Do Nots
-- Do not duplicate requirements or workflow details already present in `REQUIRMENTS.md`.
+- Do not duplicate requirements or workflow details already present in `SPEC.md`.
 - Do not store secrets or API keys in code; always use environment variables.
 - Do not ignore error handling, especially for external API calls.
 - Do not bypass code style, linting, or testing requirements.
@@ -52,5 +52,5 @@ Refer to [`REQUIRMENTS.md`](./REQUIRMENTS.md) for detailed testing instructions 
 - Update tests for any code changes.
 
 ## Reference
-- For all workflow, technical requirements, and implementation details, refer to [`REQUIRMENTS.md`](./REQUIRMENTS.md).
+- For all workflow, technical requirements, and implementation details, refer to [`SPEC.md`](./SPEC.md).
 - For more on AGENTS.md conventions, see [agents.md](https://agents.md/) and [agentdotmd.github.io](https://agentdotmd.github.io/website/)

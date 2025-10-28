@@ -1,24 +1,28 @@
 # Content Planner
 
+
 An interactive Python command-line application for AI-powered content idea generation for e-commerce products.
+Uses Ollama Cloud to generate smart customer questions and unique content ideas in JSON format.
 
 **The AI acts as a curious customer**, asking genuine questions without assumptions, helping you understand what information your customers need.
 
 Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fast, reliable dependency management.
 
+📋 **For technical specifications, architecture, and detailed design information, see [SPEC.md](./SPEC.md)**
+
 ## Features
 
-- 🤖 **AI-powered customer perspective** - AI acts like a real customer encountering your product
-- ❓ **Natural question generation** - Questions use what, who, which, whose, when, why, where, how
+- 🤖 **AI-powered customer perspective** - AI acts like a real customer, asking genuine questions before purchase
+- ❓ **Smart question generation** - Diverse question types (what, who, which, whose, when, why, where, how)
 - ⏭️ **Skip questions** - Press Enter to skip any question you don't want to answer
-- 💡 **Structured content ideas** - Generate article titles with detailed summaries (100-150 chars)
+- 💡 **Structured content ideas** - Article titles with 100-150 char summaries, returned in JSON format
 - 🚫 **Smart deduplication** - No duplicate or similar content ideas (70%+ similarity filtered)
-- 🎨 **Colorful interface** - Easy-to-read colored output (menu, questions, outputs, success messages)
-- 🤖 **AI thinking indicator** - See "AI Thinking..." with progress dots during generation
+- 🔄 **Follow-up rounds** - AI asks follow-up questions for unclear areas and explores new product aspects
+- 📊 **JSON export** for easy integration
 - 💾 **Auto-save** every 5 minutes (silent background)
 - 📝 **Manual save** with 's' key (returns to menu, not questions)
-- 🔄 **Iterative rounds** - Each round builds on previous answers
-- 📊 **JSON export** for easy integration
+- 🎨 **Colorful interface** - Easy-to-read colored output (menu, questions, outputs, success messages)
+- 🤖 **AI thinking indicator** - See "AI Thinking..." with progress dots during generation
 - ⚡ **Lightning-fast** dependency management with uv
 - 🐍 **Python 3.13** (latest stable, supported until 2029)
 
@@ -38,22 +42,15 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 ### 2. Install Dependencies
 
+- Copy the example env file
+- Edit .env and add your Ollama API key from https://ollama.com
+
+```bash
+cp .env.example .env
+```
+
 ```bash
 uv sync
-```
-
-### 3. Configure API Key
-
-```bash
-# Copy the example env file
-cp .env.example .env
-
-# Edit .env and add your Ollama API key from https://ollama.com
-```
-
-### 4. Run the App
-
-```bash
 uv run python main.py
 ```
 
@@ -75,11 +72,7 @@ uv add package-name
 
 # Add dev dependency
 uv add --dev package-name
-```
 
-### Update Dependencies
-
-```bash
 # Update all dependencies
 uv sync --upgrade
 
@@ -91,53 +84,10 @@ uv add package-name@latest
 
 ## How It Works
 
-The AI acts as a **smart customer evaluating a product before purchase**. This helps you:
 
-- Understand what questions real customers ask before buying
-- Identify information gaps in your product descriptions
-- Generate content that moves customers toward purchase decisions
-- Build comprehensive product knowledge iteratively
-- Create high-quality content optimized for buyers, search engines, and AI assistants
+The AI acts as a smart customer evaluating your product, asking genuine questions that real customers would ask before making a purchase. It uses previous Q&A context to ask follow-up questions for unclear areas and explores new product aspects. Content ideas are unique, deduplicated, and returned in JSON format.
 
-### First Round Questions
-
-The AI asks basic customer questions using various question types:
-
-- **What** is this product used for?
-- **Who** is this product designed for?
-- **How** do I use this product properly?
-- **What** makes this product different from others?
-- **What** sizes, colors, or versions are available?
-- **Where** can I buy this product?
-- **When** will it be available?
-- **Why** should I choose this product?
-- **How much** does it cost?
-
-### Follow-Up Rounds - Smart Question Strategy
-
-Each subsequent round uses intelligent question selection:
-
-1. **Follow-up questions IF there's a valid doubt or unclear information** from previous answers
-2. **Explore NEW unexplored areas** that move toward a purchase decision:
-   - Value proposition and benefits
-   - Practical usage and compatibility
-   - Pricing, warranty, and guarantees
-   - Social proof and reviews
-   - Comparison with alternatives
-   - Post-purchase support
-   - Risk mitigation (returns, trials, etc.)
-
-The AI **never re-asks clearly answered questions** and **never makes assumptions** - it only explores what helps make a buying decision.
-
-### Content Ideas - High-Quality & Unique
-
-Generated content titles are:
-
-- ✅ **Unique** - No duplicates or similar ideas (70%+ similarity filtered)
-- ✅ **High-performing** - Optimized for conversions
-- ✅ **Multi-audience** - Appeals to new buyers, search engines, and AI assistants
-- ✅ **Buyer journey focused** - Addresses awareness, consideration, and decision stages
-- ✅ **Action-oriented** - Specific, clickable, SEO-friendly titles
+**See [SPEC.md](./SPEC.md) for detailed workflow, question logic, and output format.**
 
 ---
 
@@ -221,157 +171,40 @@ Your choice (c/q/s): c
 
 ## Configuration
 
-All settings can be customized via environment variables in `.env`:
+Create a `.env` file with your Ollama API key:
 
 ```env
-# Required
 OLLAMA_API_KEY=your_api_key_here
-
-# Optional (with defaults)
-OLLAMA_MODEL=deepseek-v3.1:671b-cloud
-MAX_QUESTIONS_PER_ROUND=5
-CONTENT_IDEAS_PER_ROUND=10
-AUTOSAVE_INTERVAL_SECONDS=300
 ```
 
-### Available Ollama Cloud Models
-
-- `deepseek-v3.1:671b-cloud` (default, recommended)
-- `gpt-oss:20b-cloud`
-- `gpt-oss:120b-cloud`
-- `kimi-k2:1t-cloud`
-- `qwen3-coder:480b-cloud`
-- `glm-4.6:cloud`
+**For all configuration options and available models, see [SPEC.md](./SPEC.md)**
 
 ---
 
 ## Output Format
 
-All session data is saved to `out_content_ideas.json`:
 
-```json
+All session data is saved to `out_content_ideas.json` in structured JSON format:
+
+```
 {
-  "product_name": "Wireless Headphones",
-  "rounds": 2,
-  "qa_history": [
-    {
-      "round": 1,
-      "question": "What problem does this product solve?",
-      "answer": "Eliminates tangled wires and enables mobility",
-      "timestamp": "2025-01-27T12:00:00"
-    }
-  ],
-  "content_ideas": [
-    {
-      "title": "How Wireless Headphones Transform Your Daily Commute",
-      "summary": "Comprehensive guide on using wireless headphones for commuting, covering noise cancellation, battery life tips, and best practices."
-    },
-    {
-      "title": "Top 5 Benefits of Going Wireless for Fitness Enthusiasts",
-      "summary": "Explore key advantages of wireless headphones during workouts, including freedom of movement and sweat resistance features."
-    }
-  ],
-  "last_updated": "2025-01-27T12:30:00"
+   "product_name": "...",
+   "rounds": ...,
+   "qa_history": [
+      { "round": 1, "question": "...", "answer": "...", "timestamp": "..." },
+      ...
+   ],
+   "content_ideas": [
+      { "title": "...", "summary": "..." },
+      ...
+   ],
+   "last_updated": "..."
 }
 ```
 
----
+**For detailed output format specification, see [SPEC.md](./SPEC.md)**
 
-## Project Structure
 
-```
-content-planner/
-├── agents/              # Workflow orchestration
-│   ├── planner.py       # Main content planner agent
-│   └── session.py       # Session management & autosave
-├── ai/                  # AI integration
-│   └── client.py        # Ollama Cloud API client
-├── ui/                  # User interface
-│   └── console.py       # Console-based UI
-├── utils/               # Utilities
-│   └── config.py        # Configuration management
-├── tests/               # Test suite (11 tests)
-│   ├── test_ai.py
-│   ├── test_config.py
-│   └── test_session.py
-├── main.py              # Application entry point
-├── pyproject.toml       # Project configuration
-├── .env.example         # Environment template
-└── README.md            # This file
-```
-
----
-
-## Technology Stack
-
-- **Python**: 3.13.3 (latest stable version for 2025)
-- **Package Manager**: [uv](https://docs.astral.sh/uv/) (10-100x faster than pip)
-- **Dependencies**:
-  - `ollama` - AI integration with Ollama Cloud
-  - `python-dotenv` - Environment variable management
-  - `pytest` - Testing framework
-
-### Why uv?
-
-[uv](https://docs.astral.sh/uv/) is a blazingly fast Python package installer and resolver:
-
-- 🚀 **10-100x faster** than pip
-- 🔒 **Reliable** dependency resolution with lock files
-- 📦 **All-in-one** tool (replaces pip, virtualenv, pip-tools)
-- 🎯 **Drop-in replacement** for existing workflows
-- 💾 **Disk space efficient** with global cache
-
-### Why Python 3.13?
-
-- Latest stable release (supported until October 2029)
-- Best performance and security for production in 2025
-- Modern language features and improvements
-
----
-
-## Architecture
-
-### Core Components
-
-**AI Client** (`ai/client.py`)
-
-- Handles all Ollama Cloud API interactions
-- Generates questions based on product and context
-- Creates content ideas from Q&A sessions
-- Graceful degradation when API is unavailable
-
-**Session Manager** (`agents/session.py`)
-
-- Manages application state
-- Handles JSON persistence
-- Background autosave thread (every 5 minutes)
-- Tracks Q&A history and content ideas
-
-**Content Planner Agent** (`agents/planner.py`)
-
-- Orchestrates the main workflow
-- Coordinates between AI, UI, and session components
-- Implements iterative Q&A rounds
-
-**Console UI** (`ui/console.py`)
-
-- User input/output handling
-- Help menu and error displays
-- Formatted output for questions and ideas
-
-**Configuration** (`utils/config.py`)
-
-- Environment variable management
-- Default values and validation
-- API availability checks
-
-### Design Principles
-
-- **Modular Design**: Separate concerns (AI, UI, session, config)
-- **Type Hints**: Full type annotations for maintainability
-- **Threading**: Background autosave without blocking UI
-- **Graceful Degradation**: Works even if API fails
-- **PEP 8 Compliant**: Follows Python coding standards
 
 ---
 
@@ -414,23 +247,13 @@ uv sync --extra dev
 uv run pytest tests/ -v
 ```
 
----
-
-## Security
-
-- ✅ No secrets in code
-- ✅ Environment variables for sensitive data
-- ✅ `.env` in `.gitignore`
-- ✅ Input validation and sanitization
-- ✅ Secure API key handling
-
----
-
 ## Requirements
 
 - Python 3.13+
 - Ollama Cloud API key (free at [ollama.com](https://ollama.com/))
 - Internet connection for AI features
+
+**For detailed technical specifications, see [SPEC.md](./SPEC.md)**
 
 ---
 
@@ -442,13 +265,7 @@ MIT
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
-
-- Code follows PEP 8 standards
-- All tests pass (`uv run pytest tests/ -v`)
-- Type hints are included
-- Docstrings are added for new functions
-- Security best practices are followed
+Contributions are welcome! Please see [SPEC.md](./SPEC.md) for coding standards and technical requirements.
 
 ---
 

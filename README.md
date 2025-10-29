@@ -53,7 +53,7 @@ cp .env.example .env
 
 ```bash
 uv sync
-uv run python main.py
+uv run python run.py
 ```
 
 ### Run Tests
@@ -63,10 +63,10 @@ uv run python main.py
 uv add --dev pytest
 
 # Run all tests
-uv run pytest tests/ -v
+uv run pytest src/tests/ -v
 
 # Run specific test file
-uv run pytest tests/test_session.py -v
+uv run pytest src/tests/test_session.py -v
 ```
 
 ### Add Dependencies
@@ -312,7 +312,7 @@ Ensure all dependencies are installed:
 
 ```bash
 uv sync --extra dev
-uv run pytest tests/ -v
+uv run pytest src/tests/ -v
 ```
 
 ## Requirements

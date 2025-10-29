@@ -13,17 +13,21 @@ For all workflow, technical requirements, and implementation details, refer to [
 ## Folder Structure
 Recommended project structure:
 ```
-content-planner/
-├── agents/        # Agent logic and workflow
-├── ai/            # AI integration and question generation
-├── ui/            # Console UI/UX logic
-├── utils/         # Utility functions
-├── main.py        # Main entry point
+ai-content-planner/
+├── src/               # All source code
+│   ├── agents/        # Agent logic and workflow
+│   ├── ai/            # AI integration and question generation
+│   ├── ui/            # Console UI/UX logic
+│   ├── utils/         # Utility functions
+│   ├── tests/         # Test suite
+│   └── main.py        # Main entry point
+├── docs/              # Documentation
+├── spec/              # Specifications
+├── tools/             # Utility tools (e.g., generate_context.py)
+├── run.py             # Application launcher
+├── pyproject.toml     # Project configuration
 ├── requirements.txt
-├── out_content_ideas.json       # Output file for session data
-├── AGENTS.md
-├── spec/
-│   └── SPEC.md
+└── out_content_ideas.json  # Output file for session data
 ```
 
 
@@ -31,9 +35,9 @@ content-planner/
 - Always use [uv](https://docs.astral.sh/uv/) for building, running, testing, and managing dependencies in this project.
 - All build, run, and test commands must use uv:
 	- Install dependencies: `uv sync`
-	- Run the app: `uv run python main.py`
-	- Run all tests: `uv run pytest tests/ -v`
-	- Run specific test file: `uv run pytest tests/test_session.py -v`
+	- Run the app: `uv run python run.py` (or from src/: `uv run python main.py`)
+	- Run all tests: `uv run pytest src/tests/ -v`
+	- Run specific test file: `uv run pytest src/tests/test_session.py -v`
 	- Add runtime dependency: `uv add package-name`
 	- Add dev dependency: `uv add --dev package-name`
 	- Update all dependencies: `uv sync --upgrade`

@@ -77,14 +77,14 @@ This project is an interactive Python application for idea generation to assist 
 
 ### Core Components
 
-**AI Client** (`ai/client.py`)
+**AI Client** (`src/ai/client.py`)
 
 - Handles all Ollama Cloud API interactions
 - Generates questions based on product and context
 - Creates content ideas from Q&A sessions
 - Graceful degradation when API is unavailable
 
-**Session Manager** (`agents/session.py`)
+**Session Manager** (`src/agents/session.py`)
 
 - Manages application state
 - Handles JSON persistence (load/save)
@@ -93,7 +93,7 @@ This project is an interactive Python application for idea generation to assist 
 - Session resume with summary display
 - Intelligent deduplication (70% similarity threshold)
 
-**Content Planner Agent** (`agents/planner.py`)
+**Content Planner Agent** (`src/agents/planner.py`)
 
 - Orchestrates the main workflow
 - Coordinates between AI, UI, and session components
@@ -101,7 +101,7 @@ This project is an interactive Python application for idea generation to assist 
 - Handles session resume logic
 - Manages user choices (continue, save, quit)
 
-**Console UI** (`ui/console.py`)
+**Console UI** (`src/ui/console.py`)
 
 - User input/output handling with color-coded output
 - Interactive menus with arrow key navigation (cross-platform)
@@ -110,7 +110,7 @@ This project is an interactive Python application for idea generation to assist 
 - AI thinking indicators with model name
 - Session summary display
 
-**Configuration** (`utils/config.py`)
+**Configuration** (`src/utils/config.py`)
 
 - Environment variable management
 - Default values and validation
@@ -129,24 +129,37 @@ This project is an interactive Python application for idea generation to assist 
 ## Project Structure
 
 ```
-content-planner/
-├── agents/              # Workflow orchestration
-│   ├── planner.py       # Main content planner agent
-│   └── session.py       # Session management & autosave
-├── ai/                  # AI integration
-│   └── client.py        # Ollama Cloud API client
-├── ui/                  # User interface
-│   └── console.py       # Console-based UI
-├── utils/               # Utilities
-│   └── config.py        # Configuration management
-├── tests/               # Test suite (11 tests)
-│   ├── test_ai.py
-│   ├── test_config.py
-│   └── test_session.py
-├── main.py              # Application entry point
+ai-content-planner/
+├── src/                 # All source code
+│   ├── agents/          # Workflow orchestration
+│   │   ├── planner.py   # Main content planner agent
+│   │   └── session.py   # Session management & autosave
+│   ├── ai/              # AI integration
+│   │   └── client.py    # Ollama Cloud API client
+│   ├── ui/              # User interface
+│   │   └── console.py   # Console-based UI
+│   ├── utils/           # Utilities
+│   │   └── config.py    # Configuration management
+│   ├── tests/           # Test suite (14 tests)
+│   │   ├── test_ai.py
+│   │   ├── test_config.py
+│   │   ├── test_session.py
+│   │   └── conftest.py
+│   └── main.py          # Application entry point
+├── docs/                # Documentation
+│   ├── CHANGELOG.md
+│   └── GENERATE_CONTEXT.md
+├── spec/                # Specifications
+│   └── SPEC.md
+├── tools/               # Utility tools
+│   ├── generate_context.py
+│   └── tests/
+├── run.py               # Application launcher
 ├── pyproject.toml       # Project configuration
 ├── .env.example         # Environment template
-└── README.md            # This file
+├── AGENTS.md            # Agent guidelines
+├── README.md            # Project documentation
+└── out_content_ideas.json  # Output file (generated)
 ```
 
 ## Technology Stack

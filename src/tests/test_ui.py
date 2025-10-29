@@ -29,6 +29,30 @@ def test_get_user_choice_invalid_then_valid():
         assert result == 'u'
 
 
+def test_get_session_resume_choice_valid_options():
+    """Test that get_session_resume_choice accepts valid options: r, n, q."""
+    valid_choices = ['r', 'n', 'q']
+    
+    for choice in valid_choices:
+        with patch('builtins.input', return_value=choice):
+            result = ConsoleUI.get_session_resume_choice("Test Product")
+            assert result == choice
+
+
+def test_get_session_resume_choice_uppercase():
+    """Test that get_session_resume_choice handles uppercase input."""
+    with patch('builtins.input', return_value='R'):
+        result = ConsoleUI.get_session_resume_choice("Test Product")
+        assert result == 'r'
+
+
+def test_get_session_resume_choice_invalid_then_valid():
+    """Test that get_session_resume_choice rejects invalid input then accepts valid."""
+    with patch('builtins.input', side_effect=['x', 'r']):
+        result = ConsoleUI.get_session_resume_choice("Test Product")
+        assert result == 'r'
+
+
 def test_help_menu_displays_new_options():
     """Test that help menu includes User2AI and AI2AI modes."""
     with patch('builtins.print') as mock_print:
@@ -44,3 +68,5 @@ def test_help_menu_displays_new_options():
         # Check for new menu options
         assert 'User2AI' in all_output or 'u' in all_output.lower()
         assert 'AI2AI' in all_output or 'a' in all_output.lower()
+        # Check for session resume options
+        assert 'Resume' in all_output or 'r' in all_output.lower()

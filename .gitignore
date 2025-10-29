@@ -28,3 +28,4 @@ out_content_ideas.json
 *.swo
 context_input*.md
 CHANGES.md
+.coverage

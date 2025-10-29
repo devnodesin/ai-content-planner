@@ -43,23 +43,15 @@ class ContentPlannerAgent:
                 last_updated=session_summary['last_updated']
             )
             
-            # Show interactive menu
-            menu_options = [
-                f"Load existing session: {session_summary['product_name']}",
-                "Start a new session with a new product"
-            ]
+            # Show simplified session resume menu
+            choice = self.ui.get_session_resume_choice(session_summary['product_name'])
             
-            choice = self.ui.display_interactive_menu(
-                "📂 Session Resume",
-                menu_options
-            )
-            
-            if choice == -1:  # ESC pressed
-                logger.info("User cancelled session resume")
+            if choice == 'q':  # Quit
+                logger.info("User chose to quit")
                 self.ui.print_info("Goodbye!")
                 return
-            elif choice == 0:  # Load existing session
-                logger.info("User chose to load existing session")
+            elif choice == 'r':  # Resume existing session
+                logger.info("User chose to resume existing session")
                 if self.session.load():
                     logger.info(f"Session loaded successfully: {self.session.product_name}")
                     self.ui.print_success(f"Session loaded: {self.session.product_name}")
@@ -70,7 +62,7 @@ class ContentPlannerAgent:
                     product_name = self.ui.get_product_name()
                     self.session.set_product(product_name)
                     logger.info(f"Started new session for product: {product_name}")
-            else:  # Start new session
+            else:  # choice == 'n' - Start new session
                 logger.info("User chose to start new session")
                 product_name = self.ui.get_product_name()
                 self.session.set_product(product_name)

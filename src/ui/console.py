@@ -227,6 +227,7 @@ class ConsoleUI:
         print(f"\n{Colors.CYAN}{Colors.BOLD}{'=' * 70}")
         print(f"📋 Options: [u] User2AI Mode, [a] AI2AI Mode, [s] Save, [q] Quit")
         print(f"{'=' * 70}{Colors.RESET}")
+        sys.stdout.flush()
         
         while True:
             choice = ConsoleUI.get_input("Your choice (u/a/s/q)", allow_empty=True).lower()
@@ -237,14 +238,42 @@ class ConsoleUI:
             ConsoleUI.print_error("Invalid choice. Please enter 'u', 'a', 's', or 'q'.")
 
     @staticmethod
+    def get_session_resume_choice(product_name: str) -> str:
+        """
+        Get user's choice for session resume.
+        
+        Args:
+            product_name: Name of the existing session product
+            
+        Returns:
+            User choice: 'r' (resume), 'n' (new), or 'q' (quit)
+        """
+        print(f"\n{Colors.CYAN}{Colors.BOLD}{'=' * 70}")
+        print(f"📋 Options: [r] Resume, [n] New, [q] Quit")
+        print(f"{'=' * 70}{Colors.RESET}")
+        sys.stdout.flush()
+        
+        while True:
+            choice = ConsoleUI.get_input("Your choice (r/n/q)", allow_empty=True).lower()
+            if choice in ['r', 'n', 'q']:
+                return choice
+            if not choice:
+                continue
+            ConsoleUI.print_error("Invalid choice. Please enter 'r', 'n', or 'q'.")
+
+    @staticmethod
     def show_help_menu():
         """Display help menu with all available commands."""
         ConsoleUI.print_header("❓ Help Menu")
-        print(f"{Colors.BRIGHT_WHITE}Available Commands:{Colors.RESET}")
+        print(f"{Colors.BRIGHT_WHITE}Session Resume Commands:{Colors.RESET}")
+        ConsoleUI.print_menu_option('r', 'Resume - Load existing session and continue where you left off')
+        ConsoleUI.print_menu_option('n', 'New - Start a new session with a new product')
+        ConsoleUI.print_menu_option('q', 'Quit - Exit the application')
+        print(f"\n{Colors.BRIGHT_WHITE}Main Menu Commands:{Colors.RESET}")
         ConsoleUI.print_menu_option('u', 'User2AI Mode - Continue to next round (generate more questions)')
         ConsoleUI.print_menu_option('a', 'AI2AI Mode - Let AI generate questions and answers automatically')
-        ConsoleUI.print_menu_option('q', 'Quit and save all data to out_content_ideas.json')
         ConsoleUI.print_menu_option('s', 'Save current progress without quitting')
+        ConsoleUI.print_menu_option('q', 'Quit and save all data to out_content_ideas.json')
         print(f"\n{Colors.BRIGHT_WHITE}Features:{Colors.RESET}")
         print(f"  {Colors.DIM}• Auto-save every 5 minutes (silent background){Colors.RESET}")
         print(f"  {Colors.DIM}• Up to 5 questions per round{Colors.RESET}")

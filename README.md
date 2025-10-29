@@ -160,18 +160,16 @@ Q&A Pairs: 15
 Content Ideas: 30
 Last Updated: 2025-01-27T10:30:00
 
-📂 Session Resume
-==============================================================================
-  ▶ Load existing session: Wireless Headphones
-    Start a new session with a new product
-==============================================================================
-
-Use ↑/↓ arrow keys to navigate, Enter to select, Esc to exit
+======================================================================
+📋 Options: [r] Resume, [n] New, [q] Quit
+======================================================================
+Your choice (r/n/q): r
 ```
 
-- **Navigate** with arrow keys (↑/↓)
-- **Select** with Enter
-- **Exit** with Esc (confirms before exiting)
+**Options:**
+- **r (Resume)** - Load existing session and continue from where you left off
+- **n (New)** - Start a new session with a different product
+- **q (Quit)** - Exit the application
 
 ### Main Workflow
 

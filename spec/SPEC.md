@@ -8,25 +8,42 @@ This project is an interactive Python application for idea generation to assist 
 
 ### Workflow
 
+#### Step 0: Session Resume (Optional)
+- On startup, if a previous session exists (`out_content_ideas.json`), the application displays a summary showing:
+  - Product name
+  - Number of rounds completed
+  - Q&A pairs count
+  - Content ideas count
+  - Last updated timestamp
+- An interactive menu with arrow key navigation allows the user to:
+  - **Load existing session**: Resume where you left off
+  - **Start new session**: Begin with a new product
+- If no previous session exists, proceed directly to Step 1.
 
 #### Step 1: Enter Product Name
 - The user enters a product name (`$PRODUCT`).
-- The application uses Ollama Cloud (or any supported cloud-based AI) to generate a set of customer questions about the product. The number of questions per round is controlled by `MAX_QUESTIONS_PER_ROUND` in the config.
+- The application uses Ollama Cloud to generate customer questions about the product.
+- The number of questions per round is controlled by `MAX_QUESTIONS_PER_ROUND` in the config (default: 5).
 - Questions use diverse prompts: what, who, which, whose, when, why, where, how.
 
 #### Step 2: Interactive Q&A
 - The user answers the generated questions interactively (up to `MAX_QUESTIONS_PER_ROUND` per round).
+- **Skip Feature**: Press Enter without typing to skip any question.
+- Only answered questions are saved; skipped questions are ignored.
 
 #### Step 3: Content Idea Generation
-- Based on the user's answers, the application generates content/article ideas (titles and summaries) designed to attract humans, search engines, and AI systems.
-- Content ideas are unique, deduplicated (no similar ideas above 70% similarity), and returned in JSON format: `{ "title": ..., "summary": ... }`.
+- Based on the user's answers, the application generates content/article ideas (titles and summaries).
+- Content ideas are unique, deduplicated (no similar ideas above 70% similarity).
+- Returned in JSON format: `{ "title": ..., "summary": ... }`.
+- Designed to attract humans, search engines, and AI systems.
 
 #### Follow-Up Rounds & Smart Questioning
 - After each round, the user can:
-  - Press `q` to quit: All data is saved to `out_content_ideas.json`.
-  - Press `c` to continue: The AI generates more questions based on previous Q&A context, focusing on follow-up questions for unclear areas and exploring new, unexplored product aspects.
+  - Press `c` to **continue**: Generate more questions based on previous Q&A context, focusing on follow-up questions for unclear areas and exploring new, unexplored product aspects.
+  - Press `s` to **save**: Save current progress without quitting.
+  - Press `q` to **quit**: Save all data to `out_content_ideas.json` and exit.
 - The AI never re-asks clearly answered questions, never makes assumptions, and only asks what helps make a buying decision.
-- Autosave occurs periodically if the user works for a long time.
+- **Autosave**: Background autosave every 5 minutes (default, configurable via `AUTOSAVE_INTERVAL_SECONDS`).
 
 ### Technical Requirements
 - Use Python best practices and latest trends.
@@ -70,21 +87,28 @@ This project is an interactive Python application for idea generation to assist 
 **Session Manager** (`agents/session.py`)
 
 - Manages application state
-- Handles JSON persistence
-- Background autosave thread (every 5 minutes)
+- Handles JSON persistence (load/save)
+- Background autosave thread (configurable interval, default 5 minutes)
 - Tracks Q&A history and content ideas
+- Session resume with summary display
+- Intelligent deduplication (70% similarity threshold)
 
 **Content Planner Agent** (`agents/planner.py`)
 
 - Orchestrates the main workflow
 - Coordinates between AI, UI, and session components
 - Implements iterative Q&A rounds
+- Handles session resume logic
+- Manages user choices (continue, save, quit)
 
 **Console UI** (`ui/console.py`)
 
-- User input/output handling
+- User input/output handling with color-coded output
+- Interactive menus with arrow key navigation (cross-platform)
 - Help menu and error displays
 - Formatted output for questions and ideas
+- AI thinking indicators with model name
+- Session summary display
 
 **Configuration** (`utils/config.py`)
 
@@ -99,6 +123,8 @@ This project is an interactive Python application for idea generation to assist 
 - **Threading**: Background autosave without blocking UI
 - **Graceful Degradation**: Works even if API fails
 - **PEP 8 Compliant**: Follows Python coding standards
+- **Cross-Platform**: Works on Windows, Linux, and macOS
+- **User-Friendly**: Color-coded output, arrow key navigation, skip options
 
 ## Project Structure
 
@@ -150,7 +176,6 @@ content-planner/
 
 ## How It Works - Detailed Specification
 
-
 The AI acts as a **smart customer evaluating a product before purchase**. This helps you:
 
 - Understand what questions real customers ask before buying
@@ -158,6 +183,15 @@ The AI acts as a **smart customer evaluating a product before purchase**. This h
 - Generate content that moves customers toward purchase decisions
 - Build comprehensive product knowledge iteratively
 - Create high-quality content optimized for buyers, search engines, and AI assistants
+
+### Session Resume
+
+- On startup, the application checks for an existing session file (`out_content_ideas.json`).
+- If found, displays a summary with product name, progress statistics, and last update time.
+- Interactive menu (arrow key navigation) offers two options:
+  1. **Resume existing session** - Continue from where you left off
+  2. **Start new session** - Begin with a new product (previous session preserved)
+- Session data includes all Q&A history, content ideas, and round count.
 
 ### First Round Questions
 
@@ -168,6 +202,7 @@ The AI acts as a **smart customer evaluating a product before purchase**. This h
     - "How to use this product?"
     - "Where can I buy this product?"
     - "What sizes/colors/versions are available?"
+- Users can **skip questions** by pressing Enter without typing an answer.
 
 ### Follow-Up Rounds - Smart Question Strategy
 
@@ -183,6 +218,15 @@ The AI acts as a **smart customer evaluating a product before purchase**. This h
      - Risk mitigation (returns, trials, etc.)
 - The AI never re-asks clearly answered questions, never makes assumptions, and only explores what helps make a buying decision.
 - Questions are always numbered and returned as a list, with no commentary.
+
+### User Controls
+
+After each round, three options are available:
+- **[c] Continue** - Generate more questions and content ideas
+- **[s] Save** - Save current progress without quitting
+- **[q] Quit** - Save all data and exit the application
+
+Background autosave runs every 5 minutes (configurable) to prevent data loss.
 
 ### Content Ideas - High-Quality & Unique
 

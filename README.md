@@ -23,7 +23,11 @@ Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fas
 - 📊 **JSON export** for easy integration
 - 💾 **Auto-save** every 5 minutes (silent background)
 - 📝 **Manual save** with 's' key (returns to menu, not questions)
+- 🔄 **User2AI Mode** - Interactive Q&A with AI asking questions (default workflow)
+- 🤖 **AI2AI Mode** - Automated mode where AI generates both questions and answers _(coming soon)_
 - 🎨 **Colorful interface** - Easy-to-read colored output (menu, questions, outputs, success messages)
+- 🐛 **Logging support** - Optional logging for debugging and monitoring
+- 🧪 **Code coverage** - Built-in pytest-cov for test coverage analysis
 - 🤖 **AI model display** - See which AI model is being used during generation
 - ⚡ **Lightning-fast** dependency management with uv
 - 🐍 **Python 3.13** (latest stable, supported until 2029)
@@ -59,14 +63,21 @@ uv run python run.py
 ### Run Tests
 
 ```bash
-# Install pytest
-uv add --dev pytest
-
 # Run all tests
 uv run pytest src/tests/ -v
 
 # Run specific test file
 uv run pytest src/tests/test_session.py -v
+
+# Run tests with coverage report
+uv run pytest src/tests/ -v --cov=src --cov-report=term
+
+# Run tests with detailed coverage (shows missing lines)
+uv run pytest src/tests/ -v --cov=src --cov-report=term-missing
+
+# Generate HTML coverage report
+uv run pytest src/tests/ -v --cov=src --cov-report=html
+# Then open htmlcov/index.html in your browser
 ```
 
 ### Add Dependencies
@@ -168,9 +179,10 @@ Use ↑/↓ arrow keys to navigate, Enter to select, Esc to exit
 2. **Answer Customer Questions** - Respond to 5 AI-generated questions from a customer perspective
 3. **Review Content Ideas** - Get 10 article title ideas that address customer concerns
 4. **Choose Action**:
-   - `c` - Continue with more questions (AI asks follow-up questions based on your answers)
-   - `q` - Quit and save all data to `out_content_ideas.json`
+   - `u` - **User2AI Mode** - Continue with more questions (AI asks follow-up questions based on your answers)
+   - `a` - **AI2AI Mode** - Let AI generate both questions and answers automatically _(not implemented yet)_
    - `s` - Save current progress (returns to menu, not questions)
+   - `q` - Quit and save all data to `out_content_ideas.json`
 
 ### Example Session
 
@@ -226,13 +238,13 @@ Your answer: Available on our website and Amazon, shipping worldwide
   ...
 
 ======================================================================
-📋 Options: [c] Continue, [s] Save, [q] Quit
+📋 Options: [u] User2AI Mode, [a] AI2AI Mode, [s] Save, [q] Quit
 ======================================================================
-Your choice (c/q/s): s
+Your choice (u/a/s/q): s
 
 ✓ Progress saved! (out_content_ideas.json)
 
-Your choice (c/q/s): c
+Your choice (u/a/s/q): u
 ```
 
 ---

@@ -4,6 +4,29 @@ import sys
 import time
 from typing import List, Optional
 
+# Fix Windows Unicode encoding (only if not in pytest)
+if sys.platform == 'win32' and 'pytest' not in sys.modules:
+    try:
+        import io
+        if hasattr(sys.stdout, 'buffer'):
+            # line_buffering=True ensures output is flushed after each line
+            # write_through=True ensures immediate write without buffering
+            sys.stdout = io.TextIOWrapper(
+                sys.stdout.buffer, 
+                encoding='utf-8',
+                line_buffering=True,
+                write_through=True
+            )
+        if hasattr(sys.stderr, 'buffer'):
+            sys.stderr = io.TextIOWrapper(
+                sys.stderr.buffer, 
+                encoding='utf-8',
+                line_buffering=True,
+                write_through=True
+            )
+    except (AttributeError, ValueError):
+        pass  # Already wrapped or not needed
+
 # Platform-specific keyboard input handling
 if sys.platform == 'win32':
     import msvcrt
@@ -56,6 +79,7 @@ class ConsoleUI:
         print(f"\n{Colors.CYAN}{Colors.BOLD}{'=' * 70}")
         print(f"  {text}")
         print(f"{'=' * 70}{Colors.RESET}\n")
+        sys.stdout.flush()  # Ensure immediate display
 
     @staticmethod
     def print_section(text: str):
@@ -63,6 +87,7 @@ class ConsoleUI:
         print(f"\n{Colors.BLUE}{Colors.BOLD}{'-' * 70}")
         print(f"  {text}")
         print(f"{'-' * 70}{Colors.RESET}\n")
+        sys.stdout.flush()  # Ensure immediate display
 
     @staticmethod
     def print_info(text: str):
@@ -197,26 +222,27 @@ class ConsoleUI:
         Get user's choice to continue or quit.
         
         Returns:
-            User choice: 'c', 'q', or 's'
+            User choice: 'u', 'a', 'q', or 's'
         """
         print(f"\n{Colors.CYAN}{Colors.BOLD}{'=' * 70}")
-        print(f"📋 Options: [c] Continue, [s] Save, [q] Quit")
+        print(f"📋 Options: [u] User2AI Mode, [a] AI2AI Mode, [s] Save, [q] Quit")
         print(f"{'=' * 70}{Colors.RESET}")
         
         while True:
-            choice = ConsoleUI.get_input("Your choice (c/q/s)", allow_empty=True).lower()
-            if choice in ['c', 'q', 's']:
+            choice = ConsoleUI.get_input("Your choice (u/a/s/q)", allow_empty=True).lower()
+            if choice in ['u', 'a', 'q', 's']:
                 return choice
             if not choice:
                 continue
-            ConsoleUI.print_error("Invalid choice. Please enter 'c', 'q', or 's'.")
+            ConsoleUI.print_error("Invalid choice. Please enter 'u', 'a', 's', or 'q'.")
 
     @staticmethod
     def show_help_menu():
         """Display help menu with all available commands."""
         ConsoleUI.print_header("❓ Help Menu")
         print(f"{Colors.BRIGHT_WHITE}Available Commands:{Colors.RESET}")
-        ConsoleUI.print_menu_option('c', 'Continue to next round (generate more questions)')
+        ConsoleUI.print_menu_option('u', 'User2AI Mode - Continue to next round (generate more questions)')
+        ConsoleUI.print_menu_option('a', 'AI2AI Mode - Let AI generate questions and answers automatically')
         ConsoleUI.print_menu_option('q', 'Quit and save all data to out_content_ideas.json')
         ConsoleUI.print_menu_option('s', 'Save current progress without quitting')
         print(f"\n{Colors.BRIGHT_WHITE}Features:{Colors.RESET}")
@@ -243,31 +269,50 @@ class ConsoleUI:
     def _get_key():
         """
         Get a single keypress from the user (cross-platform).
+        This function BLOCKS until a valid key is pressed.
         
         Returns:
             String representing the key pressed
         """
         if sys.platform == 'win32':
-            # Windows
-            key = msvcrt.getch()
-            # Handle special keys (arrow keys, etc.)
-            if key in (b'\x00', b'\xe0'):
+            # Windows - use msvcrt for raw key input (blocking)
+            while True:
+                # This blocks until a key is pressed
                 key = msvcrt.getch()
-                if key == b'H':  # Up arrow
-                    return 'up'
-                elif key == b'P':  # Down arrow
-                    return 'down'
+                
+                # Handle special keys (arrow keys, etc.)
+                if key in (b'\x00', b'\xe0'):
+                    # Extended key, read the second byte
+                    key2 = msvcrt.getch()
+                    if key2 == b'H':  # Up arrow
+                        return 'up'
+                    elif key2 == b'P':  # Down arrow
+                        return 'down'
+                    elif key2 == b'K':  # Left arrow
+                        return 'left'
+                    elif key2 == b'M':  # Right arrow
+                        return 'right'
+                    # Ignore other extended keys and continue waiting
+                    continue
+                elif key == b'\r':  # Enter (carriage return)
+                    return 'enter'
+                elif key == b'\n':  # Enter (line feed)
+                    return 'enter'
                 elif key == b'\x1b':  # Esc
                     return 'esc'
-            elif key == b'\r':  # Enter
-                return 'enter'
-            elif key == b'\x1b':  # Esc
-                return 'esc'
-            else:
-                try:
-                    return key.decode('utf-8')
-                except:
-                    return None
+                elif key == b'\x03':  # Ctrl+C
+                    raise KeyboardInterrupt
+                else:
+                    # Try to decode as UTF-8
+                    try:
+                        char = key.decode('utf-8', errors='ignore')
+                        if char and char.isprintable():
+                            return char
+                        # Ignore non-printable characters and continue waiting
+                        continue
+                    except:
+                        # If decode fails, ignore this key and continue waiting
+                        continue
         else:
             # Unix/Linux/Mac
             fd = sys.stdin.fileno()
@@ -278,21 +323,29 @@ class ConsoleUI:
                 
                 # Check for escape sequences (arrow keys)
                 if ch == '\x1b':
-                    ch2 = sys.stdin.read(1)
-                    if ch2 == '[':
-                        ch3 = sys.stdin.read(1)
-                        if ch3 == 'A':  # Up arrow
-                            return 'up'
-                        elif ch3 == 'B':  # Down arrow
-                            return 'down'
+                    # Try to read more characters for escape sequences
+                    import select
+                    if select.select([sys.stdin], [], [], 0.1)[0]:
+                        ch2 = sys.stdin.read(1)
+                        if ch2 == '[':
+                            ch3 = sys.stdin.read(1)
+                            if ch3 == 'A':  # Up arrow
+                                return 'up'
+                            elif ch3 == 'B':  # Down arrow
+                                return 'down'
+                            elif ch3 == 'C':  # Right arrow
+                                return 'right'
+                            elif ch3 == 'D':  # Left arrow
+                                return 'left'
                     return 'esc'
                 elif ch == '\r' or ch == '\n':  # Enter
                     return 'enter'
+                elif ch == '\x03':  # Ctrl+C
+                    raise KeyboardInterrupt
                 else:
                     return ch
             finally:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return None
 
     @staticmethod
     def display_interactive_menu(title: str, options: List[str], selected_index: int = 0) -> int:
@@ -308,10 +361,20 @@ class ConsoleUI:
             Index of selected option, or -1 if ESC was pressed
         """
         current_selection = selected_index
+        first_display = True
         
         while True:
             # Clear previous output (simple approach)
-            print('\n' * 2)
+            if not first_display:
+                # Move cursor up to redraw menu
+                if sys.platform == 'win32':
+                    # On Windows, just print newlines
+                    print('\n' * 2)
+                else:
+                    # On Unix, we can use ANSI codes to move cursor
+                    print('\n' * 2)
+            
+            first_display = False
             
             # Display title
             ConsoleUI.print_header(title)
@@ -325,9 +388,14 @@ class ConsoleUI:
                     print(f"    {Colors.DIM}{option}{Colors.RESET}")
             
             print(f"\n{Colors.DIM}Use ↑/↓ arrow keys to navigate, Enter to select, Esc to exit{Colors.RESET}")
+            sys.stdout.flush()  # Ensure immediate display before waiting for input
             
             # Get user input
-            key = ConsoleUI._get_key()
+            try:
+                key = ConsoleUI._get_key()
+            except KeyboardInterrupt:
+                print(f"\n{Colors.BRIGHT_CYAN}👋 Goodbye!{Colors.RESET}")
+                return -1
             
             if key == 'up':
                 current_selection = (current_selection - 1) % len(options)
@@ -339,9 +407,16 @@ class ConsoleUI:
             elif key == 'esc':
                 # Confirm exit
                 print(f"\n{Colors.YELLOW}Are you sure you want to exit? (y/n): {Colors.RESET}", end='', flush=True)
-                confirm = ConsoleUI._get_key()
-                if confirm and confirm.lower() == 'y':
+                try:
+                    confirm = ConsoleUI._get_key()
+                    if confirm and confirm.lower() == 'y':
+                        print()  # Add newline
+                        return -1
+                    # If not 'y', continue the menu loop
+                except KeyboardInterrupt:
+                    print(f"\n{Colors.BRIGHT_CYAN}👋 Goodbye!{Colors.RESET}")
                     return -1
+            # Ignore other keys and continue loop
 
     @staticmethod
     def display_session_summary(product_name: str, rounds: int, qa_count: int, ideas_count: int, last_updated: str):
@@ -362,4 +437,5 @@ class ConsoleUI:
         print(f"{Colors.BRIGHT_WHITE}{Colors.BOLD}Content Ideas:{Colors.RESET} {ideas_count}")
         print(f"{Colors.BRIGHT_WHITE}{Colors.BOLD}Last Updated:{Colors.RESET} {Colors.DIM}{last_updated}{Colors.RESET}")
         print()
+        sys.stdout.flush()  # Ensure immediate display
 

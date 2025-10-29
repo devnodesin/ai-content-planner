@@ -27,3 +27,4 @@ out_content_ideas.json
 *.swp
 *.swo
 context_input*.md
+CHANGES.md

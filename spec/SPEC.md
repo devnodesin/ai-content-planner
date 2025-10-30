@@ -9,39 +9,61 @@ This project is an interactive Python application for idea generation to assist 
 ### Workflow
 
 #### Step 0: Session Resume (Optional)
-- On startup, if a previous session exists (`out_content_ideas.json`), the application displays a summary showing:
+- On startup, if a previous session exists (`out/content_ideas.json`), the application displays a summary showing:
   - Product name
   - Number of rounds completed
   - Q&A pairs count
   - Content ideas count
   - Last updated timestamp
-- An interactive menu with arrow key navigation allows the user to:
-  - **Load existing session**: Resume where you left off
-  - **Start new session**: Begin with a new product
+- An interactive menu allows the user to:
+  - **[r] Resume existing session**: Load and continue where you left off
+  - **[n] Start new session**: Begin with a new product
+  - **[q] Quit**: Exit the application
 - If no previous session exists, proceed directly to Step 1.
+- After choosing Resume or New, proceed to Step 0.5 (Main Menu).
+
+#### Step 0.5: Main Menu (Always Shown)
+- After session resume/new or after each round, the main menu is displayed:
+  - **[u] User2AI Mode**: Interactive Q&A where user answers AI questions
+  - **[a] AI2AI Mode**: Automated Q&A where AI answers AI questions using context file
+  - **[s] Save**: Save current progress and return to menu
+  - **[q] Quit**: Save and exit application
+- User selects a mode to continue.
 
 #### Step 1: Enter Product Name
-- The user enters a product name (`$PRODUCT`).
+- If starting a new session, the user enters a product name (`$PRODUCT`).
+- If resuming, the product name is loaded from the session.
+
+#### Step 2: Mode Selection
+Based on the main menu choice:
+
+**User2AI Mode (`[u]`):**
 - The application uses Ollama Cloud to generate customer questions about the product.
 - The number of questions per round is controlled by `MAX_QUESTIONS_PER_ROUND` in the config (default: 5).
 - Questions use diverse prompts: what, who, which, whose, when, why, where, how.
-
-#### Step 2: Interactive Q&A
-- The user answers the generated questions interactively (up to `MAX_QUESTIONS_PER_ROUND` per round).
+- User answers the generated questions interactively (up to `MAX_QUESTIONS_PER_ROUND` per round).
 - **Skip Feature**: Press Enter without typing to skip any question.
 - Only answered questions are saved; skipped questions are ignored.
 
+**AI2AI Mode (`[a]`):**
+- Customer AI agent generates questions using Ollama Cloud.
+- Salesman AI agent answers questions using product context from `out/context.md`.
+- All Q&A pairs are automatically saved to the session.
+- No user interaction needed during the Q&A round.
+
 #### Step 3: Content Idea Generation
-- Based on the user's answers, the application generates content/article ideas (titles and summaries).
+- Based on the Q&A (from either mode), the application generates content/article ideas (titles and summaries).
 - Content ideas are unique, deduplicated (no similar ideas above 70% similarity).
 - Returned in JSON format: `{ "title": ..., "summary": ... }`.
 - Designed to attract humans, search engines, and AI systems.
 
-#### Follow-Up Rounds & Smart Questioning
-- After each round, the user can:
-  - Press `c` to **continue**: Generate more questions based on previous Q&A context, focusing on follow-up questions for unclear areas and exploring new, unexplored product aspects.
-  - Press `s` to **save**: Save current progress without quitting.
-  - Press `q` to **quit**: Save all data to `out_content_ideas.json` and exit.
+#### Step 4: Return to Main Menu
+- After each round, the user returns to the main menu (Step 0.5).
+- User can:
+  - Press `u` to **User2AI Mode**: Answer more questions manually
+  - Press `a` to **AI2AI Mode**: Let AI generate and answer questions automatically
+  - Press `s` to **save**: Save current progress without quitting
+  - Press `q` to **quit**: Save all data to `out/content_ideas.json` and exit
 - The AI never re-asks clearly answered questions, never makes assumptions, and only asks what helps make a buying decision.
 - **Autosave**: Background autosave every 5 minutes (default, configurable via `AUTOSAVE_INTERVAL_SECONDS`).
 

@@ -24,7 +24,10 @@ Built with Python 3.13 and managed with [uv](https://docs.astral.sh/uv/) for fas
 - 💾 **Auto-save** every 5 minutes (silent background)
 - 📝 **Manual save** with 's' key (returns to menu, not questions)
 - 🔄 **User2AI Mode** - Interactive Q&A with AI asking questions (default workflow)
-- 🤖 **AI2AI Mode** - Automated mode where AI generates both questions and answers _(coming soon)_
+- 🤖 **AI2AI Mode** - Automated mode where customer AI and salesman AI interact automatically
+  - Customer agent generates questions
+  - Salesman agent answers using product context from `out/context.md`
+  - Separate configurable models for each agent
 - 🎨 **Colorful interface** - Easy-to-read colored output (menu, questions, outputs, success messages)
 - 🐛 **Logging support** - Optional logging for debugging and monitoring
 - 🧪 **Code coverage** - Built-in pytest-cov for test coverage analysis
@@ -148,7 +151,7 @@ The AI acts as a smart customer evaluating your product, asking genuine question
 
 ### Session Resume
 
-On startup, if an existing session file (`out_content_ideas.json`) is found, you'll see:
+On startup, if an existing session file (`out/content_ideas.json`) is found, you'll see:
 
 ```bash
 📂 Existing Session Found
@@ -173,27 +176,70 @@ Your choice (r/n/q): r
 
 ### Main Workflow
 
-1. **Enter Product Name** - Type your product name (e.g., "Wireless Headphones")
-2. **Answer Customer Questions** - Respond to 5 AI-generated questions from a customer perspective
-3. **Review Content Ideas** - Get 10 article title ideas that address customer concerns
-4. **Choose Action**:
-   - `u` - **User2AI Mode** - Continue with more questions (AI asks follow-up questions based on your answers)
-   - `a` - **AI2AI Mode** - Let AI generate both questions and answers automatically _(not implemented yet)_
-   - `s` - Save current progress (returns to menu, not questions)
-   - `q` - Quit and save all data to `out_content_ideas.json`
+1. **Session Resume (if applicable)** - Choose to resume existing session or start new
+2. **Main Menu** - Select mode: User2AI, AI2AI, Save, or Quit
+3. **Enter Product Name** (if new session) - Type your product name
+4. **Mode Execution**:
+   - **User2AI Mode**: AI generates questions → You answer them
+   - **AI2AI Mode**: AI generates questions → AI answers them (using context file)
+5. **Review Content Ideas** - Get article title ideas with summaries
+6. **Return to Main Menu** - Choose next action
+
+### Menu Flow
+
+After session resume or starting new:
+```
+======================================================================
+📋 Options: [u] User2AI Mode, [a] AI2AI Mode, [s] Save, [q] Quit
+======================================================================
+Your choice (u/a/s/q): 
+```
+
+**Options:**
+- `u` - **User2AI Mode** - AI asks questions, you answer them
+- `a` - **AI2AI Mode** - AI asks and answers questions automatically using `out/context.md`
+- `s` - Save current progress (returns to menu)
+- `q` - Quit and save all data to `out/content_ideas.json`
 
 ### Example Session
 
 ```bash
-🎯 Content Planner - Product Input
-==============================================================================
+$ uv run python run.py
 
-Enter product name: Wireless Headphones
+# If existing session found
+📂 Existing Session Found
+----------------------------------------------------------------------
+Product/Topic: Wireless Headphones
+Rounds Completed: 2
+Q&A Pairs: 10
+Content Ideas: 20
+Last Updated: 2025-01-27T10:30:00
+
+======================================================================
+📋 Options: [r] Resume, [n] New, [q] Quit
+======================================================================
+Your choice (r/n/q): n
+
+======================================================================
+  🎯 Content Planner - Product Input
+======================================================================
+
+Enter product name: Smart Fitness Tracker
+
+======================================================================
+📋 Options: [u] User2AI Mode, [a] AI2AI Mode, [s] Save, [q] Quit
+======================================================================
+Your choice (u/a/s/q): u
 
 🤖 AI is generating questions (model: deepseek-v3.1:671b-cloud)...
 
-📝 Questions & Answers
 ----------------------------------------------------------------------
+  📝 Questions & Answers
+----------------------------------------------------------------------
+
+💡 Tip: Press Enter without typing to skip a question
+
+[1/5] What is the primary function of the Smart Fitness Tracker?
 
 💡 Tip: Press Enter without typing to skip a question
 
@@ -252,8 +298,24 @@ Your choice (u/a/s/q): u
 Create a `.env` file with your Ollama API key:
 
 ```env
+# Required: Customer agent API key
 OLLAMA_API_KEY=your_api_key_here
+
+# Optional: Separate configuration for salesman agent in AI2AI mode
+# If not set, uses OLLAMA_API_KEY and OLLAMA_MODEL
+OLLAMA_API_KEY_SALESMAN=your_api_key_here
+OLLAMA_MODEL_SALESMAN=minimax-m2:cloud
 ```
+
+### AI2AI Mode Setup
+
+To use AI2AI mode:
+
+1. Create/edit `out/context.md` with your product information
+2. Configure salesman agent in `.env` (optional, uses customer settings if not set)
+3. Select `[a] AI2AI Mode` from the main menu
+
+The `out/context.md` file should contain comprehensive product details that the salesman agent will use to answer questions. A template is provided in the file.
 
 **For all configuration options and available models, see [SPEC.md](./spec/SPEC.md)**
 
@@ -262,7 +324,7 @@ OLLAMA_API_KEY=your_api_key_here
 ## Output Format
 
 
-All session data is saved to `out_content_ideas.json` in structured JSON format:
+All session data is saved to `out/content_ideas.json` in structured JSON format:
 
 ```
 {

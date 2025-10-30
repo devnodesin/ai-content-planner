@@ -4,6 +4,7 @@ from typing import List
 from ai import AIClient
 from ui import ConsoleUI
 from .session import SessionManager
+from .ai2ai_agent import AI2AIAgent
 from utils.config import Config
 from utils.logger import get_logger
 
@@ -19,6 +20,7 @@ class ContentPlannerAgent:
         self.ai_client = AIClient()
         self.ui = ConsoleUI()
         self.session = SessionManager()
+        self.ai2ai_agent = None  # Initialized when needed
 
     def run(self):
         """Run the main application loop."""
@@ -78,30 +80,49 @@ class ContentPlannerAgent:
         self.session.start_autosave()
         
         try:
-            # Main interaction loop
-            first_round = True
+            # Main interaction loop - always show menu first
             while True:
-                # For first round, automatically continue; for subsequent rounds, show menu first
-                if not first_round:
-                    choice = self.ui.get_user_choice()
-                    logger.info(f"User selected menu option: {choice}")
-                    
-                    if choice == 'q':
-                        logger.info("User chose to quit")
-                        break
-                    elif choice == 's':
-                        logger.info("User chose to save progress")
-                        self.session.save()
-                        self.ui.print_success("Progress saved!", file_name=Config.OUTPUT_FILE)
-                        continue  # Go back to menu
-                    elif choice == 'a':
-                        logger.info("User selected AI2AI Mode (not implemented)")
-                        self.ui.print_warning("AI2AI Mode is not implemented yet.")
-                        continue  # Go back to menu
-                    # 'u' continues to generate questions (User2AI Mode)
-                    logger.info("Continuing with User2AI Mode")
+                # Show menu and get user choice
+                choice = self.ui.get_user_choice()
+                logger.info(f"User selected menu option: {choice}")
                 
-                first_round = False
+                if choice == 'q':
+                    logger.info("User chose to quit")
+                    break
+                elif choice == 's':
+                    logger.info("User chose to save progress")
+                    self.session.save()
+                    self.ui.print_success("Progress saved!", file_name=Config.OUTPUT_FILE)
+                    continue  # Go back to menu
+                elif choice == 'a':
+                    logger.info("User selected AI2AI Mode")
+                    # Initialize AI2AI agent if not already done
+                    if not self.ai2ai_agent:
+                        self.ai2ai_agent = AI2AIAgent(self.session)
+                    
+                    # Run AI2AI round
+                    success = self.ai2ai_agent.run_round()
+                    
+                    if not success:
+                        self.ui.print_error("AI2AI round failed. Please check configuration.")
+                        continue
+                    
+                    # Generate content ideas after AI2AI round
+                    logger.debug("Generating content ideas from AI")
+                    self.ui.print_ai_thinking("AI is generating content ideas", model_name=Config.OLLAMA_MODEL)
+                    ideas = self._generate_content_ideas()
+                    
+                    if ideas:
+                        logger.info(f"Generated {len(ideas)} content ideas")
+                        self.session.add_content_ideas(ideas)
+                        self.ui.display_content_ideas(ideas, self.session.round_count)
+                    else:
+                        logger.warning("Failed to generate content ideas")
+                        self.ui.print_warning("Could not generate content ideas.")
+                    
+                    continue  # Go back to menu
+                # 'u' continues to User2AI Mode
+                logger.info("User selected User2AI Mode")
                 
                 # Generate questions with AI thinking indicator
                 logger.debug("Generating questions from AI")

@@ -15,9 +15,6 @@ dist/
 # Environment
 .env
 
-# Output
-out_content_ideas.json
-
 # Testing
 .pytest_cache/
 
@@ -26,7 +23,7 @@ out_content_ideas.json
 .idea/
 *.swp
 *.swo
-context_input*.md
 CHANGES.md
 .coverage
 /temp
+/out

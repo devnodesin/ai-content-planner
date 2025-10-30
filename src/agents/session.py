@@ -22,6 +22,9 @@ class SessionManager:
         self.autosave_thread: threading.Thread = None
         self.autosave_enabled: bool = False
         self.last_save_time: float = time.time()
+        
+        # Ensure output directory exists
+        self.output_file.parent.mkdir(parents=True, exist_ok=True)
 
     def set_product(self, product_name: str):
         """Set the product name."""

@@ -29,3 +29,4 @@ out_content_ideas.json
 context_input*.md
 CHANGES.md
 .coverage
+/temp

@@ -55,7 +55,7 @@ class AI2AIAgent:
         # Generate questions with customer agent
         logger.debug("Customer agent generating questions")
         self.ui.print_ai_thinking(
-            "Customer AI is generating questions",
+            "AI: CUSTOMER is generating questions",
             model_name=self.customer_agent.model
         )
         
@@ -83,7 +83,7 @@ class AI2AIAgent:
             # Get answer from salesman agent
             logger.debug(f"Salesman agent answering question {i}")
             self.ui.print_ai_thinking(
-                "Salesman AI is thinking",
+                "AI: SALESMAN is thinking",
                 model_name=self.salesman_agent.model
             )
             

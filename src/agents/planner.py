@@ -5,6 +5,7 @@ from ai import AIClient
 from ui import ConsoleUI
 from .session import SessionManager
 from .ai2ai_agent import AI2AIAgent
+from .content_expert_agent import ContentExpertAgent
 from utils.config import Config
 from utils.logger import get_logger
 
@@ -18,6 +19,7 @@ class ContentPlannerAgent:
     def __init__(self):
         """Initialize the content planner agent."""
         self.ai_client = AIClient()
+        self.content_expert = ContentExpertAgent()
         self.ui = ConsoleUI()
         self.session = SessionManager()
         self.ai2ai_agent = None  # Initialized when needed
@@ -109,7 +111,7 @@ class ContentPlannerAgent:
                     
                     # Generate content ideas after AI2AI round
                     logger.debug("Generating content ideas from AI")
-                    self.ui.print_ai_thinking("AI is generating content ideas", model_name=Config.OLLAMA_MODEL)
+                    self.ui.print_ai_thinking("AI: Content Expert is generating content ideas", model_name=self.content_expert.model)
                     ideas = self._generate_content_ideas()
                     
                     if ideas:
@@ -126,7 +128,7 @@ class ContentPlannerAgent:
                 
                 # Generate questions with AI thinking indicator
                 logger.debug("Generating questions from AI")
-                self.ui.print_ai_thinking("AI is generating questions", model_name=Config.OLLAMA_MODEL)
+                self.ui.print_ai_thinking("AI: CUSTOMER is generating questions", model_name=self.ai_client.customer_agent.model)
                 questions = self._generate_questions()
                 
                 if not questions:
@@ -158,7 +160,7 @@ class ContentPlannerAgent:
                 
                 # Generate content ideas with AI thinking indicator
                 logger.debug("Generating content ideas from AI")
-                self.ui.print_ai_thinking("AI is generating content ideas", model_name=Config.OLLAMA_MODEL)
+                self.ui.print_ai_thinking("AI: Content Expert is generating content ideas", model_name=self.content_expert.model)
                 ideas = self._generate_content_ideas()
                 
                 if ideas:
@@ -189,8 +191,8 @@ class ContentPlannerAgent:
         )
 
     def _generate_content_ideas(self) -> List[str]:
-        """Generate content ideas using AI."""
-        return self.ai_client.generate_content_ideas(
+        """Generate content ideas using Content Expert Agent."""
+        return self.content_expert.generate_content_ideas(
             self.session.product_name,
             self.session.get_qa_context(),
             self.session.get_content_ideas()
